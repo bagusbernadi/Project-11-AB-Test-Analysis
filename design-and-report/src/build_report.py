@@ -121,15 +121,15 @@ def sec4():
     return table(["Tool", "Rancangan", "Dipakai"], [
         ["Python (pandas, SciPy, statsmodels)", "Ya", "Ya"],
         ["DuckDB + SQL", "Ya", "Ya"],
-        ["Streamlit (dashboard)", "Ya", "Belum"],
+        ["Streamlit (dashboard)", "Ya", "Ya"],
         ["Markdown (README)", "Ya", "Ya, angka dari CSV"],
-    ]) + '<p class="report-note">Streamlit belum dipakai; dashboard belum dibuat.</p>'
+    ]) + '<p class="report-note">Semua tool rancangan dipakai. Notebook belum dibuat.</p>'
 
 
 def sec5():
     return table(["No", "Langkah rancangan", "Status"], [
         ["1", "Tulis rancangan dan aturan uji", verdict("Sesuai")],
-        ["2", "Tulis kamus data", verdict("Sebagian")],
+        ["2", "Tulis kamus data", verdict("Sesuai")],
         ["3", "Cek kualitas data", verdict("Sesuai")],
         ["4", "Cleaning dengan log", verdict("Sesuai")],
         ["5", "Muat ke DuckDB", verdict("Sesuai")],
@@ -139,21 +139,21 @@ def sec5():
         ["9", "Bootstrap dan sensitivitas", verdict("Sesuai")],
         ["10", "Estimasi dampak", verdict("Sesuai")],
         ["11", "Cek silang SQL vs Python", verdict("Sesuai")],
-        ["12", "Dashboard, one-sheet, README", verdict("Sebagian")],
-    ]) + '<p class="report-note">Dari 12 langkah rancangan: 10 selesai, 2 sebagian (kamus data dan dashboard, one-sheet, slide).</p>'
+        ["12", "Dashboard, one-sheet, README", verdict("Sesuai")],
+    ]) + '<p class="report-note">Dari 12 langkah rancangan: 12 selesai. Notebook dan slide belum termasuk langkah.</p>'
 
 
 def sec6():
     return table(["Output", "Status"], [
-        ["Dashboard Streamlit", verdict("Belum")],
-        ["One-sheet PDF/PNG", verdict("Belum")],
+        ["Dashboard Streamlit (4 halaman)", verdict("Sesuai")],
+        ["One-sheet PDF/PNG", verdict("Sesuai")],
         ["Database DuckDB dan folder SQL", verdict("Sesuai")],
         ["Modul Python uji A/B", verdict("Sebagian")],
         ["Notebook analisis", verdict("Belum")],
         ["README", verdict("Sesuai")],
         ["Repositori GitHub", verdict("Sesuai")],
         ["Slide (opsional)", verdict("Belum")],
-    ]) + '<p class="report-note">Output yang belum ada harus dibuat sebelum project dianggap selesai.</p>'
+    ]) + '<p class="report-note">Notebook, modul Python yang dipisah dari skrip, dan slide belum dibuat.</p>'
 
 
 def sec7():
@@ -170,11 +170,11 @@ def sec7():
         '<li>Q1–Q14 terjawab dengan angka dari data: tercapai.</li>'
         '<li>Aturan uji tertulis sebelum hasil dilihat: tercapai.</li>'
         '<li>SRM dilaporkan jujur: tercapai.</li>'
-        '<li>Dashboard bisa dibuka dan keputusan dijelaskan dalam 1 menit: belum.</li></ul></div>'
+        '<li>Dashboard bisa dibuka dan keputusan dijelaskan dalam 1 menit: tercapai (cek manual belum dilakukan).</li></ul></div>'
         '<h4>7.4 Rekomendasi</h4><div class="card">'
         '<p><b>Jangan rollout dari angka ini saja.</b> Pastikan mekanisme alokasi grup dengan pemilik data, lalu jalankan ulang test dengan alokasi acak 50:50 dan catat sumber serta tanggalnya.</p></div>'
         '<h4>7.5 Saran perbaikan</h4><div class="card"><ul>'
-        '<li>Buat dashboard Streamlit dan one-sheet.</li>'
+        '<li>Buat notebook analisis Q1–Q14 dan modul Python yang bisa dipakai ulang.</li>'
         '<li>Ubah angka README agar diambil dari CSV.</li>'
         '<li>Tambahkan kolom tanggal dan negara jika ada, agar Q3 dan Q8 bisa dijawab penuh.</li></ul></div>'
         '<h4>7.6 Batasan</h4><div class="card"><ul>'
