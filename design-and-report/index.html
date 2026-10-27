@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Project 11: A/B Test Analysis</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Analisis A/B test: iklan (ad) vs PSA pada 588 ribu user. Kualitas data, SRM, uji proporsi, segmen, dan rekomendasi.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: tema terang ala Google (single theme, sengaja): latar putih keabuan, kartu putih;
+   biru = struktur, kuning = penanda utama, hijau = info pendukung, merah = aksen.
+   Skala huruf: H1 32 · H2 25 · H3 19 · body 16.5 · keterangan 14 · label 12.5 */
+:root{color-scheme:light;
+--bg:#F8F9FA;--card:#FFFFFF;--sub:#F1F3F4;--line:#DADCE0;
+--ink:#202124;--head:#174EA6;--mut:#5F6368;
+--navy:#1A73E8;--navy-ink:#FFFFFF;--teal:#188038;--amber:#FBBC04;--amber-ink:#3C2A00;--bar:#1A73E8;--soft:#E8F0FE;
+--gb:#4285F4;--gr:#EA4335;--gy:#FBBC04;--gg:#34A853;
+--navyH:#1A73E8;--amberH:#B06000;--tealH:#188038;--plumH:#9334E6;--roseH:#D93025;--skyH:#1967D2;--onph:#fff;
+--f:"Source Sans 3",Calibri,Carlito,"Segoe UI",Arial,sans-serif;
+--h1:clamp(26px,2.6vw,32px);--h2:clamp(21px,2vw,25px);--h3:19px;--body:16.5px;--small:14px;--label:12.5px}
+[hidden]{display:none!important}
+*{box-sizing:border-box}html{scroll-padding-top:64px;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 var(--body)/1.6 var(--f)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+main{max-width:880px;margin:0 auto;padding-block:16px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+b,strong{font-weight:700}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);padding:8px 0;display:flex;gap:6px;overflow-x:auto}
+nav a{flex:none;background:var(--card);border:1px solid var(--line);color:var(--ink);text-decoration:none;border-radius:999px;padding:6px 14px;font-size:var(--small);font-weight:600}
+nav a:hover,nav a:focus-visible{background:var(--amber);border-color:var(--amber);color:var(--amber-ink);outline:none}
+.banner{background:var(--navy);color:var(--navy-ink);border-radius:18px;padding:22px 26px}
+.banner h1{margin:0 0 8px;font-size:var(--h1);font-weight:800;line-height:1.2;text-wrap:balance;letter-spacing:-.01em}.banner p{margin:0;font-size:18px;line-height:1.55;opacity:.97}.banner .goal b{font-weight:800}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.tags{align-items:center}.tlab{font-size:var(--small);font-weight:700;margin-right:4px;opacity:.95}
+.tag{border-radius:999px;padding:3px 12px;font-size:var(--label);font-weight:700;background:rgba(255,255,255,.2);letter-spacing:.02em}.tag.a{background:var(--amber);color:var(--amber-ink)}
+.card{border-radius:16px;padding:16px 20px;background:var(--card);border:1px solid var(--line);margin:12px 0}
+.card p{margin:8px 0}
+h2{font-size:var(--h2);font-weight:800;color:var(--head);margin:48px 0 10px;padding-bottom:8px;border-bottom:2px solid var(--line);line-height:1.25;text-wrap:balance}
+h2 small{display:block;font-size:var(--small);font-weight:400;color:var(--mut);margin-top:4px}
+h3{font-size:var(--h3);font-weight:700;color:var(--head);margin:16px 0 6px;line-height:1.3}
+.card h3:first-child,.card>div>h3:first-child{margin-top:4px}
+.add{display:inline-block;vertical-align:middle;margin-left:8px;border-radius:999px;padding:2px 10px;font-size:var(--label);font-weight:700;background:var(--teal);color:#fff}
+.how{background:var(--soft);border-radius:12px;padding:12px 16px;margin:10px 0;font-size:var(--small);line-height:1.55;color:var(--ink)}.how::before{content:"Cara membaca ";font-weight:700;color:var(--teal)}
+.callout{border-radius:14px;padding:14px 20px;margin:12px 0;font-size:16px}.callout h4{margin:0 0 6px;font-size:var(--h3);font-weight:700}.callout p{margin:6px 0}
+.callout.a{background:var(--amber);color:var(--amber-ink)}.callout.g{background:var(--teal);color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}.kpis .card{margin:0}
+.kpi .v{font-size:30px;font-weight:800;display:block;line-height:1.15;color:var(--head);font-variant-numeric:tabular-nums}.kpi .l{display:block;font-weight:700;font-size:16px;margin-top:2px}.kpi .d{display:block;font-size:var(--small);line-height:1.4;margin-top:6px;color:var(--mut)}
+.kpi.t{background:var(--teal);border-color:var(--teal);color:#fff}.kpi.am{background:var(--amber);border-color:var(--amber);color:var(--amber-ink)}
+.kpi.t .v,.kpi.t .d,.kpi.am .v,.kpi.am .d{color:inherit}
+table{border-collapse:collapse;width:100%;font-size:15px;background:var(--card);border-radius:12px;overflow:hidden}
+th{background:var(--navy);color:var(--navy-ink);padding:9px 12px;text-align:left;vertical-align:top;font-weight:700}
+td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:nth-child(odd) td{background:var(--sub)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin:10px 0}
+.q{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:6px 0;display:grid;grid-template-columns:40px 1fr;gap:4px 8px;font-size:16px;line-height:1.45}
+.q .id{font-weight:800;color:var(--head)}.q .m{grid-column:2;font-size:var(--small);color:var(--mut)}
+.pri{display:inline-block;border-radius:999px;padding:1px 9px;font-size:var(--label);font-weight:700;margin-left:6px;background:var(--sub);border:1px solid var(--line);color:var(--mut)}.pri.M{background:var(--amber);border-color:var(--amber);color:var(--amber-ink)}.pri.S{background:var(--navy);border-color:var(--navy);color:#fff}
+.theme{font-size:var(--label);font-weight:700;color:var(--teal);margin:20px 0 4px;text-transform:uppercase;letter-spacing:.08em}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0}
+.flow span{border-radius:999px;padding:5px 12px;font-size:var(--small);font-weight:700;background:var(--sub);border:1px solid var(--line)}
+.flow span.ng{background:var(--amber);border-color:var(--amber);color:var(--amber-ink)}.flow span.ok{background:var(--teal);border-color:var(--teal);color:#fff}.flow i{font-style:normal;color:var(--mut);font-size:var(--small)}
+.row{display:flex;align-items:center;gap:8px;margin:6px 0;width:100%;font:inherit;font-size:var(--small);color:var(--ink);background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.row .n{width:96px;flex:none;font-weight:600}.row .tr{flex:1;background:var(--sub);border-radius:8px;height:24px;position:relative;overflow:hidden}
+.row .b{position:absolute;left:0;top:0;bottom:0;border-radius:8px;background:var(--bar);transition:width .25s}
+.row.sel .b{background:var(--amber)}.row.sel .n{color:var(--head);font-weight:800}
+.row .c{width:58px;text-align:right;flex:none;font-variant-numeric:tabular-nums;font-weight:600}
+.row:focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:8px}
+.ctl{display:flex;align-items:center;gap:12px;margin:14px 0 10px;font-weight:700;font-size:15px}.ctl input{flex:1;accent-color:#F2A541}.ctl output{min-width:48px;text-align:right}
+.res{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}.res div{background:var(--sub);border-radius:12px;padding:10px 14px;font-size:var(--small);color:var(--mut)}.res b{display:block;font-size:24px;font-weight:800;color:var(--head);font-variant-numeric:tabular-nums}
+.steps{counter-reset:s;display:grid;gap:8px;margin:10px 0;padding:0;list-style:none}
+.steps li{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px 12px 54px;position:relative}
+.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:14px;top:12px;width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;display:grid;place-items:center;font-size:14px}
+.steps li.L::before{background:var(--amber);color:var(--amber-ink)}
+.steps b.t{display:block;font-size:17px;color:var(--head);line-height:1.3}.steps p{margin:6px 0;font-size:15px;line-height:1.5}.steps .meta{font-size:13px;color:var(--mut)}
+.phase{font-size:var(--label);font-weight:700;color:var(--teal);margin:18px 0 0;text-transform:uppercase;letter-spacing:.08em}
+.tools{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:12px 0}.tools .card{margin:0}
+.tools b{display:block;font-size:var(--h3);color:var(--head)}.tools .r{font-size:15px;margin:6px 0 0}.tools .alt{font-size:var(--small);color:var(--mut);margin:8px 0 0;padding-top:8px;border-top:1px dashed var(--line)}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:8px 0}summary{cursor:pointer;font-weight:700;font-size:17px;color:var(--head)}details p{font-size:15.5px}
+.pill{border-radius:999px;padding:1px 9px;font-size:var(--label);font-weight:700;background:var(--teal);color:#fff;margin-left:4px}.pill.d{background:var(--sub);border:1px solid var(--line);color:var(--mut)}
+.chip{display:inline-block;border-radius:999px;padding:3px 11px;margin:3px 4px 3px 0;font-size:var(--small);font-weight:600;background:var(--sub);border:1px solid var(--line)}
+.tm{border-bottom:2px dotted var(--amber);background:rgba(242,165,65,.16);border-radius:4px;padding:0 2px;cursor:help}
+#tip{position:fixed;display:none;max-width:320px;white-space:pre-line;background:#202124;color:#fff;padding:10px 12px;border-radius:12px;font-size:var(--small);line-height:1.4;z-index:20;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+ul.tight{margin:6px 0;padding-left:20px}ul.tight li{margin:5px 0}
+.intro>.layout{grid-column:1/-1}
+.layout{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}.layout .lead{margin:4px 0 10px;max-width:90ch}
+.figw{overflow-x:auto;margin:8px 0}.figw svg{display:block;width:100%;min-width:860px;height:auto;font-family:var(--f)}
+.figw .lane{fill:var(--sub)}.figw .box{fill:var(--card);stroke:var(--line);stroke-width:1.5}.figw .box.hi{stroke:var(--bar);stroke-width:2.5}
+.figw text{fill:var(--ink)}.figw .ln{font-size:15px;font-weight:700;fill:var(--head)}.figw .gl{font-size:13px;font-weight:700;fill:var(--teal);letter-spacing:.03em}
+.figw .bt{font-size:13px}.figw .b{font-size:15px;font-weight:700}.figw .st{font-size:13px;fill:var(--mut)}
+.figw .grp{stroke:var(--teal);stroke-width:2}.figw .ar{stroke:var(--bar);stroke-width:2}.figw .ah{fill:var(--bar)}
+.figw .ng,.figw .ngs{stroke:var(--amber);stroke-width:2;stroke-dasharray:5 4}.figw .aha{fill:var(--amber)}.figw .nl{font-size:14px;font-weight:700;fill:var(--amberH)}
+.figw .dt{stroke:var(--mut);stroke-width:2;stroke-dasharray:2 4}
+.figw .okb{fill:var(--teal)}.figw .scb{fill:var(--amber)}.figw .wt{fill:#fff;font-size:14px;font-weight:700}.figw .at{fill:var(--amber-ink);font-size:14px;font-weight:700}
+.figw .mk{fill:var(--amber)}.figw .mt{fill:var(--amber-ink);font-size:14px;font-weight:800}
+.legend{counter-reset:l;list-style:none;padding:0;margin:10px 0 0;display:grid;gap:10px}
+.legend li{counter-increment:l;position:relative;padding-left:38px;font-size:15.5px;line-height:1.55}
+.legend li::before{content:counter(l);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;background:var(--amber);color:var(--amber-ink);font-weight:800;font-size:14px;display:grid;place-items:center}
+@media (min-width:1000px){.legend{grid-template-columns:repeat(4,1fr);gap:16px}}
+.kpi{--h:var(--navyH);background:color-mix(in srgb,var(--h) 11%,var(--card));border-color:color-mix(in srgb,var(--h) 35%,var(--card))}
+.kpi .v{color:var(--h)}.kpi .l{color:var(--ink)}.kpi .d{color:var(--mut)}
+.q[data-p="M"]{background:color-mix(in srgb,var(--amber) 13%,var(--card));border-color:color-mix(in srgb,var(--amber) 60%,var(--card))}
+.q[data-p="S"]{background:color-mix(in srgb,var(--skyH) 9%,var(--card));border-color:color-mix(in srgb,var(--skyH) 35%,var(--card))}
+.q[data-p="N"]{border-style:dashed}
+.q[data-p="M"] .id{color:var(--amberH)}.q[data-p="S"] .id{color:var(--skyH)}.q[data-p="N"] .id{color:var(--mut)}
+.pri.S{background:var(--skyH);border-color:var(--skyH);color:var(--onph)}
+.fbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:12px 0 4px}.fbar span{font-size:var(--small);font-weight:700;color:var(--mut);margin-right:2px}
+.fb{font:inherit;font-size:var(--small);font-weight:700;cursor:pointer;border-radius:999px;padding:6px 14px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.fb i{font-style:normal;opacity:.7;margin-left:4px}.fb:hover{border-color:var(--bar)}.fb:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.fb.on{background:var(--navy);border-color:var(--navy);color:#fff}.fb.on[data-f="M"]{background:var(--amber);border-color:var(--amber);color:var(--amber-ink)}.fb.on[data-f="S"]{background:var(--skyH);border-color:var(--skyH);color:var(--onph)}
+.defs p{margin:0 0 12px}.defs p:last-child{margin:0}
+.fx{display:inline-block;margin:2px 0;padding:1px 9px;border-radius:8px;background:color-mix(in srgb,var(--tealH) 12%,var(--card));border:1px solid color-mix(in srgb,var(--tealH) 40%,var(--card));color:var(--tealH);font-weight:700;font-size:15px;white-space:normal}
+.figw.fl svg{min-width:520px;max-width:1000px;margin:0 auto}.flowfull .card{padding:20px 24px}.flowfull .card>p{text-align:center;margin:12px 0 0}.figw .dia{fill:var(--sub);stroke:var(--bar);stroke-width:2}.figw .b2{font-size:14px;font-weight:700}
+.figw .arT{fill:none;stroke:var(--teal);stroke-width:2}.figw .aht{fill:var(--teal)}.figw .arA{fill:none;stroke:var(--amber);stroke-width:2}.figw .aha2{fill:var(--amber)}
+.figw .lt{font-size:13px;font-weight:700;fill:var(--tealH)}.figw .la{font-size:13px;font-weight:700;fill:var(--amberH)}
+.ph .phase{color:var(--ph);font-size:13.5px}
+.ph .steps li{background:color-mix(in srgb,var(--ph) 8%,var(--card));border-color:color-mix(in srgb,var(--ph) 32%,var(--card))}
+.ph .steps li::before,.ph .steps li.L::before{background:var(--ph);color:var(--onph)}
+.ph .steps b.t{color:var(--ink)}
+.steps li.L::after{content:"beban besar";position:absolute;right:12px;top:12px;font-size:11.5px;font-weight:700;letter-spacing:.03em;padding:1px 8px;border-radius:999px;border:1px solid var(--ph,var(--amber));color:var(--ph,var(--amber))}
+.steps li.L b.t{padding-right:84px}
+.banner{background:linear-gradient(120deg,#1A73E8,#4285F4)}
+h2{border-bottom:3px solid transparent;border-image:linear-gradient(90deg,var(--gb) 0 60px,var(--line) 60px) 1}
+nav a:nth-child(4n+1):hover{background:var(--gb);border-color:var(--gb);color:#fff}nav a:nth-child(4n+2):hover{background:var(--gr);border-color:var(--gr);color:#fff}nav a:nth-child(4n+4):hover{background:var(--gg);border-color:var(--gg);color:#fff}
+.callout.g{background:#E6F4EA;color:#0D652D;border:1px solid #A8DAB5}.callout.g h4{color:#137333}
+.callout.a{background:#FEF7E0;color:#3C2A00;border:1px solid #FDD663}
+.outs{display:grid;gap:12px;margin:12px 0}.outs .card{margin:0}
+.out{--h:var(--navyH);border-top:4px solid var(--h)}
+.out .oh{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.out .oh b{font-size:var(--h3);color:var(--h);line-height:1.3}
+.ob{flex:none;border-radius:999px;padding:1px 9px;font-size:var(--label);font-weight:700;background:var(--amber);color:var(--amber-ink)}.ob.opt{background:var(--sub);border:1px solid var(--line);color:var(--mut)}
+.out ul{margin:8px 0 0;padding-left:18px;font-size:15px;line-height:1.5}.out li{margin:4px 0}
+.out li:nth-last-child(-n+2){color:var(--mut);font-size:14px}
+@media (min-width:700px){.outs{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1280px){.outs{grid-template-columns:repeat(4,1fr)}}
+/* layar lebar: nav jadi sidebar, konten dibagi kolom */
+.two{display:grid;gap:0 24px;align-items:start}.two>*{min-width:0}
+.qgrid{display:grid;gap:0 12px}.qgrid>*{min-width:0}
+@media (min-width:1000px){
+main{max-width:1480px}
+.two,.qgrid{grid-template-columns:1fr 1fr}.qgrid .theme{grid-column:1/-1}
+.kpis{grid-template-columns:repeat(6,1fr)}.tools{grid-template-columns:repeat(3,1fr)}
+.intro{display:grid;grid-template-columns:1fr 1fr;column-gap:28px;align-items:start}.intro h3{grid-column:1/-1}.intro>p{grid-column:1}.intro>.scroll{grid-column:2;grid-row:2/span 3;margin-top:8px}
+.phases{display:grid;grid-template-columns:repeat(2,1fr);gap:0 24px}.phases>*{min-width:0}
+}
+@media (min-width:1280px){
+main{display:grid;grid-template-columns:190px minmax(0,1fr);column-gap:32px}
+main>*{grid-column:2}
+main>nav{grid-column:1;grid-row:1/span 60;align-self:start;flex-direction:column;padding-top:16px}
+main>nav a{border-radius:10px;font-size:15px;padding:8px 14px}
+.phases{grid-template-columns:repeat(4,1fr)}
+}
+@media (max-width:620px){.kpis,.res{grid-template-columns:1fr 1fr}.tools{grid-template-columns:1fr}.row .n{width:78px}.banner{padding:18px}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.row .b{transition:none}}
+/* tambahan */
+.card a{color:var(--navy);font-weight:600}
+.row .n{width:130px}
+.tag.c1{background:#188038;color:#fff}.tag.c2{background:#9334E6;color:#fff}.tag.c3{background:#D93025;color:#fff}.tag.c4{background:#fff;color:#174EA6}
+.wf{display:grid;gap:0}
+.wrow{display:grid;gap:0}
+.wl{--c:var(--navyH);background:color-mix(in srgb,var(--c) 8%,var(--card));border:1px solid color-mix(in srgb,var(--c) 30%,var(--card));border-radius:14px;padding:12px 14px 14px;min-width:0}
+.wl h4{margin:0 0 6px;color:var(--c);font-size:13.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.ws{display:grid;gap:24px;padding-top:8px}
+.wb{position:relative;background:var(--card);border:2px solid var(--c);border-radius:12px;padding:10px 12px 10px 54px;font-size:15px;line-height:1.35;min-height:56px}
+.wb .n{position:absolute;left:12px;top:10px;width:30px;height:30px;border-radius:50%;background:var(--c);color:var(--onph);display:grid;place-items:center;font-weight:800;font-size:14px}
+.wb b{display:block;color:var(--ink)}.wb .s{display:block;font-size:13px;color:var(--mut);margin-top:2px}
+.wb.L::before{content:"beban besar";position:absolute;top:-11px;right:10px;background:var(--amber);color:var(--amber-ink);font-size:11px;font-weight:700;padding:0 8px;border-radius:999px;line-height:20px}
+.wb::after{content:"↓";position:absolute;left:50%;bottom:-23px;transform:translateX(-50%);color:var(--c);font-weight:800;font-size:16px}
+.ws>.wb:last-child::after{content:none}
+.wsep{text-align:center;color:var(--mut);font-weight:800;font-size:20px;line-height:28px}.wsep::before{content:"↓"}
+@media (min-width:1200px){
+.wrow{grid-template-columns:2fr 30px 3fr;align-items:stretch}
+.wrow>.wsep{display:grid;place-items:center}.wrow>.wsep::before{content:"→"}
+.ws{grid-template-columns:repeat(var(--k),minmax(0,1fr));gap:22px}
+.wl[style*="--k:5"] .ws{grid-template-columns:repeat(5,minmax(0,1fr))}
+.wb::after{content:"→";left:auto;right:-19px;bottom:auto;top:50%;transform:translateY(-50%)}
+}
+@media (max-width:620px){.row .n{width:112px;font-size:13px}}
+
+.tab{flex:none;font:inherit;font-size:15px;font-weight:800;cursor:pointer;background:var(--card);border:2px solid var(--line);color:var(--ink);border-radius:999px;padding:6px 16px}
+.tab[data-t=design]{--c:var(--navy)}.tab[data-t=report]{--c:var(--teal)}
+.tab:hover{border-color:var(--c)}.tab.on{background:var(--c);border-color:var(--c);color:#fff}.tab:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.links{display:contents}.links[data-tab=design]{--ac:var(--navy)}.links[data-tab=report]{--ac:var(--teal)}
+.links a{font-size:13.5px;font-weight:600;color:var(--mut);padding:5px 12px}
+.pane code{font-size:.92em;background:var(--sub);border-radius:4px;padding:1px 5px;overflow-wrap:anywhere}
+.pane pre{background:var(--sub);border:1px solid var(--line);border-radius:12px;padding:12px 16px;overflow-x:auto;font-size:14px;line-height:1.5}.pane pre code{background:none;padding:0;overflow-wrap:normal}
+.pill.p{background:var(--amber);color:var(--amber-ink)}
+.callout a{color:inherit;font-weight:700;text-decoration:underline}
+@media (min-width:1280px){
+main>nav{gap:8px}
+.tab{border-radius:12px;font-size:16px;padding:12px 16px;text-align:left;border-left:8px solid var(--c)}
+.links{display:flex;flex-direction:column;gap:2px;margin:0 0 8px 12px;padding-left:12px;border-left:3px solid var(--ac)}
+main>nav .links a{background:none;border:0;border-radius:8px;font-size:14.5px;font-weight:600;color:var(--mut);padding:6px 10px}
+main>nav .links a:hover,main>nav .links a:focus-visible{background:var(--soft);color:var(--head)}
+}
+
+.nav-note{font-size:var(--small);color:var(--mut)}
+.badge-no{background:var(--roseH);color:#fff;border-radius:999px;padding:1px 9px;font-size:var(--label);font-weight:700}
+.badge-ok{background:var(--teal);color:#fff;border-radius:999px;padding:1px 9px;font-size:var(--label);font-weight:700}
+.badge-ns{background:var(--sub);border:1px solid var(--line);color:var(--mut);border-radius:999px;padding:1px 9px;font-size:var(--label);font-weight:700}
+.pane[hidden]{display:none!important}
+.links a{margin-right:6px}
+</style>
+<body>
+<a href="https://bagusbernadi.github.io/" style="display:inline-block;margin:12px 16px;font:600 14px/1.4 'Source Sans 3',Arial,sans-serif;color:#1A73E8;text-decoration:none">← All projects / Semua project</a>
+<main>
+<nav aria-label="Project navigation"><button type="button" class="tab on" data-t="design" aria-expanded="true" aria-controls="design">Design Project</button><div class="links" data-tab="design"><a href="#s1">Background</a><a href="#s2">Business Questions</a><a href="#s3">Significance &amp; Decision</a><a href="#s4">Dataset</a><a href="#s5">Tools</a><a href="#s6">Work Plan</a><a href="#s7">Project Outputs</a><a href="#s8">Success Criteria</a><a href="#s9">Assumptions &amp; Limitations</a></div><button type="button" class="tab" data-t="report" aria-expanded="false" aria-controls="report">Report Project</button><div class="links" data-tab="report" hidden><a href="#rp1">Problem</a><a href="#rp2">Data</a><a href="#rp3">Analysis</a><a href="#rp4">Recommendation</a><a href="#rp5">Impact</a><a href="#rp6">Batasan</a></div></nav>
+
+<header class="banner"><h1>Project 11: A/B Test Analysis</h1>
+<p class="goal"><b>Tujuan project:</b> menguji apakah iklan (ad) menghasilkan conversion rate lebih tinggi daripada PSA (layanan masyarakat), dan apakah selisihnya cukup besar dan stabil untuk dijadikan dasar keputusan kampanye.</p>
+<div class="tags"><span class="tlab">Kategori:</span><span class="tag a">Rancangan project v2</span><span class="tag c1">Marketing</span><span class="tag c2">Dataset publik</span><span class="tag c3">Statistik</span></div></header>
+
+<div class="pane" id="design" data-tab="design">
+<section class="card intro">
+<h3>Project Introduction</h3>
+<p>Bayangkan sebuah toko online yang ingin tahu apakah iklan benar-benar membuat pengunjung membeli, atau pengunjung akan membeli juga tanpa iklan. Sebagian user melihat iklan, sebagian lain melihat PSA. Setelah itu kita hitung berapa persen user di tiap grup yang akhirnya melakukan konversi.</p>
+<p>Misalnya grup iklan mencapai 2,6% konversi dan grup PSA 1,8%. Apakah selisih itu nyata, atau kebetulan? Jika nyata, berapa besar tambahan konversinya, dan apakah cukup untuk diputuskan sebagai kebijakan?</p>
+<div class="scroll"><table><tr><th>Di toko fisik</th><th>Di project ini</th></tr>
+<tr><td>Promo yang dipasang</td><td>Grup <b>ad</b> (iklan) dan grup <b>psa</b> (layanan masyarakat)</td></tr>
+<tr><td>Pengunjung yang membeli</td><td>Konversi: <code>converted = True</code></td></tr>
+<tr><td>Selisih karena hari itu kebetulan ramai</td><td>Variasi acak, diukur dengan p-value dan confidence interval</td></tr>
+<tr><td>Pengunjung yang melihat promo berkali-kali</td><td>Intensitas iklan (<code>total ads</code>), dipakai untuk segmentasi</td></tr></table></div>
+</section>
+
+<h2 id="s1">1. Background <small>Latar belakang masalah</small></h2>
+<div class="card">
+<h3>Latar belakang masalah</h3>
+<p>Tim marketing perlu tahu apakah iklan layak dipakai sebagai pengganti PSA di halaman yang sama. Keputusan ini mahal jika salah: iklan menghasilkan pendapatan tapi juga biaya tayang, sedangkan PSA punya fungsi lain. Karena itu keputusan harus didasarkan pada bukti yang bisa diverifikasi.</p>
+<h3>Alasan memilih tema ini sebagai portofolio</h3>
+<p>Dataset ini memperlihatkan langkah lengkap A/B test: pembagian grup, cek kualitas, uji proporsi, segmentasi, dan keputusan. Dataset ini juga punya masalah nyata yang harus dijelaskan, yaitu pembagian grup yang sangat tidak seimbang.</p>
+</div>
+
+<h2 id="s2">2. Business Questions <small>Pertanyaan yang akan dijawab</small></h2>
+<h4>Pertanyaan utama</h4>
+<div class="card"><p>Apakah menampilkan iklan menghasilkan conversion rate lebih tinggi daripada PSA, dan apakah selisihnya cukup besar untuk dijadikan dasar keputusan?</p></div>
+<h4>Daftar pertanyaan (14)</h4>
+<div class="q"><span class="id">Q1</span><span>Apakah data bersih (grup valid, tanpa user ganda)?</span><span class="m">Cleaning dan log</span></div>
+<div class="q"><span class="id">Q2</span><span>Apakah pembagian grup seimbang 50:50 (SRM)?</span><span class="m">Chi-square</span></div>
+<div class="q"><span class="id">Q3</span><span>Bagaimana komposisi grup per hari dalam seminggu?</span><span class="m">Diganti dari komposisi negara (dataset tidak punya negara)</span></div>
+<div class="q"><span class="id">Q4</span><span>Berapa conversion rate ad dan psa, dan berapa selisihnya?</span><span class="m">Hasil utama</span></div>
+<div class="q"><span class="id">Q5</span><span>Apakah selisih signifikan (uji z dua proporsi)?</span><span class="m">p-value</span></div>
+<div class="q"><span class="id">Q6</span><span>Berapa confidence interval selisih?</span><span class="m">95%</span></div>
+<div class="q"><span class="id">Q7</span><span>Berapa Cohen's h dan power untuk MDE 0,5 poin?</span><span class="m">Besar efek dan daya</span></div>
+<div class="q"><span class="id">Q8</span><span>Apakah selisih sama di tiap hari dalam seminggu?</span><span class="m">Diganti dari negara US/UK/CA</span></div>
+<div class="q"><span class="id">Q9</span><span>Apakah selisih bergantung pada intensitas iklan (kuartil total ads)?</span><span class="m">Diganti dari efek kebaruan (tanpa tanggal)</span></div>
+<div class="q"><span class="id">Q10</span><span>Berapa tambahan konversi per 1 juta user (estimasi, dengan rentang)?</span><span class="m">Diberi label estimated</span></div>
+<div class="q"><span class="id">Q11</span><span>Berapa ukuran sampel per grup untuk MDE 0,5 poin?</span><span class="m">Power 80%, alpha 0,05</span></div>
+<div class="q"><span class="id">Q12</span><span>Apakah hasil stabil menurut bootstrap?</span><span class="m">2.000 resample</span></div>
+<div class="q"><span class="id">Q13</span><span>Apakah baris outlier (total ads di atas P99) mengubah kesimpulan?</span><span class="m">Sensitivitas</span></div>
+<div class="q"><span class="id">Q14</span><span>Apakah hasil SQL (DuckDB) sama dengan Python?</span><span class="m">Cek silang, jika DuckDB dipakai</span></div>
+
+
+<h2 id="s3">3. Significance &amp; Decision <small>Alur keputusan rollout</small></h2>
+<div class="flow"><span>Cek kualitas data</span><i>→</i><span class="ng">SRM gagal?</span><i>→</i><span>Uji selisih</span><i>→</i><span>Besar efek dan stabilitas</span><i>→</i><span class="ok">Keputusan</span></div>
+<div class="card"><p>Rollout hanya disarankan jika selisih signifikan (p &lt; 0,05), confidence interval tidak melewati nol, dan efek stabil di segmen utama. Jika SRM gagal, kesimpulan kausal ditulis dengan batasan eksplisit.</p></div>
+<h4>Kenapa ukuran sampel menentukan kesimpulan</h4>
+<div class="card"><p>Dengan sampel sangat besar, selisih kecil pun bisa signifikan. Karena itu keputusan juga melihat besar efek dan confidence interval, bukan hanya p-value.</p></div>
+
+<h2 id="s4">4. Dataset <small>Sumber, ukuran, dan hipotesis</small></h2>
+<div class="card">
+<p><b>Sumber:</b> Kaggle, "Marketing A/B Testing" (faviovaz/marketing-ab-testing), file <code>marketing_AB.csv</code>. Lisensi dan sitasi belum diverifikasi.</p>
+<p><b>Ukuran:</b> 588.101 baris, satu baris per user. Tidak ada kolom tanggal dan negara.</p>
+<p><b>Kolom:</b> <code>user id</code>, <code>test group</code> (ad / psa), <code>converted</code>, <code>total ads</code>, <code>most ads day</code>, <code>most ads hour</code>.</p>
+</div>
+<h4>Hipotesis yang akan diuji (belum terbukti)</h4>
+<div class="card"><ol>
+<li>Iklan tidak meningkatkan conversion rate secara bermakna dibanding PSA.</li>
+<li>Pembagian grup seimbang 50:50. (Diuji dengan SRM.)</li>
+<li>Selisih conversion rate tidak berbeda antar hari dalam seminggu.</li>
+<li>Selisih conversion rate tidak bergantung pada intensitas iklan (kuartil total ads).</li>
+<li>Baris outlier (total ads di atas P99) tidak mengubah kesimpulan.</li></ol></div>
+<h3>Empat tabel yang akan dibuat</h3>
+<div class="scroll"><table><tr><th>Tabel</th><th>Isi</th></tr>
+<tr><td><code>users</code></td><td>Data bersih, satu baris per user</td></tr>
+<tr><td><code>group_summary</code></td><td>n, konversi, dan conversion rate per grup</td></tr>
+<tr><td><code>segment_day</code></td><td>Conversion rate per hari dalam seminggu, dengan koreksi Holm</td></tr>
+<tr><td><code>test_results</code></td><td>Semua uji statistik dan sensitivitas</td></tr></table></div>
+
+
+<h2 id="s5">5. Tools <small>Alat yang dipakai</small></h2>
+<div class="tools">
+<div class="card"><b>Python</b><p class="r">pandas, numpy, SciPy, statsmodels</p><p class="alt">Uji z, CI, Cohen's h, bootstrap, Holm</p></div>
+<div class="card"><b>DuckDB + SQL</b><p class="r">Penyimpanan dan query</p><p class="alt">Opsional, untuk cek silang Q14</p></div>
+<div class="card"><b>Streamlit</b><p class="r">Dashboard</p><p class="alt">Belum dibuat, tahap D</p></div>
+<div class="card"><b>Markdown</b><p class="r">README dan laporan</p><p class="alt">Angka diambil dari CSV</p></div>
+</div>
+
+<h2 id="s6">6. Work Plan <small>12 langkah</small></h2>
+<h4>Tahap A · Perencanaan</h4>
+<ol class="steps">
+<li><b class="t">Tulis rancangan dan aturan uji</b><p>Alpha 0,05 dua arah, power 80%, MDE 0,5 poin.</p></li>
+<li><b class="t">Tulis kamus data</b><p>Definisi setiap kolom.</p></li></ol>
+<h4>Tahap B · Menyiapkan data</h4>
+<ol class="steps">
+<li><b class="t">Cek kualitas data</b><p>Grup valid, duplikat, nilai hilang.</p></li>
+<li><b class="t">Cleaning dengan log</b><p>Setiap baris yang dibuang dicatat.</p></li>
+<li><b class="t">Muat ke DuckDB (opsional)</b><p>Tabel sesuai bagian 4.</p></li></ol>
+<h4>Tahap C · Menghitung dan menganalisis</h4>
+<ol class="steps">
+<li><b class="t">SRM</b><p>Chi-square terhadap rasio 50:50.</p></li>
+<li><b class="t">Uji selisih</b><p>Uji z, CI, Cohen's h, dan power.</p></li>
+<li><b class="t">Segmen</b><p>Hari dalam seminggu dan kuartil total ads.</p></li>
+<li><b class="t">Bootstrap dan sensitivitas</b><p>2.000 resample, dan buang outlier di atas P99.</p></li>
+<li><b class="t">Estimasi dampak</b><p>Konversi per 1 juta user, diberi label estimated.</p></li>
+<li><b class="t">Cek silang</b><p>SQL vs Python, jika DuckDB dipakai.</p></li></ol>
+<h4>Tahap D · Menyajikan</h4>
+<ol class="steps">
+<li><b class="t">Dashboard, one-sheet, dan README</b><p>Keputusan, batasan, dan cara menjalankan ulang.</p></li></ol>
+
+<h2 id="s7">7. Project Outputs <small>Hasil yang bisa dibuka dan dipakai ulang</small></h2>
+<div class="card"><ul>
+<li><b>Dashboard Streamlit</b> (utama): ringkasan, kualitas data (SRM), segmen, kalkulator sampel.</li>
+<li><b>One-sheet PDF/PNG</b> (utama): ringkasan satu halaman.</li>
+<li><b>Database DuckDB dan folder SQL</b> (utama, jika dipakai).</li>
+<li><b>Modul Python uji A/B</b> (utama): fungsi uji yang bisa dipakai ulang.</li>
+<li><b>Notebook analisis Q1–Q14</b> (utama).</li>
+<li><b>README</b> (utama): problem, data, analisis, rekomendasi, dampak, batasan.</li>
+<li><b>Repositori GitHub</b> (utama).</li>
+<li><b>Slide</b> (opsional).</li></ul></div>
+
+<h2 id="s8">8. Success Criteria <small>Kapan project dianggap selesai</small></h2>
+<div class="card"><ul>
+<li>Q1–Q13 terjawab dengan angka dari data.</li>
+<li>Aturan uji tertulis sebelum hasil dilihat dan tidak diubah.</li>
+<li>SRM dilaporkan jujur, termasuk kegagalannya.</li>
+<li>Pembaca awam bisa menyebut keputusan dan alasannya dalam 1 menit.</li></ul></div>
+
+<h2 id="s9">9. Assumptions &amp; Limitations <small>Keputusan dan hal yang perlu diwaspadai</small></h2>
+<div class="card"><ul>
+<li><b>Jenis data:</b> dataset publik, apa adanya. Temuan berlaku untuk dataset ini.</li>
+<li><b>Tanpa nilai pembelian:</b> dampak revenue hanya ilustrasi.</li>
+<li><b>Tanpa tanggal dan negara:</b> efek kebaruan dan tren waktu tidak bisa diuji.</li>
+<li><b>Total ads mungkin dipengaruhi perlakuan:</b> dipakai untuk deskripsi, bukan kontrol kausal.</li>
+<li><b>SRM gagal:</b> mekanisme alokasi grup tidak diketahui. Ini batasan utama.</li></ul></div>
+</div>
+
+<div class="pane" id="report" data-tab="report" hidden>
+<h2 id="rp1">1. Problem <small>Pertanyaan yang dijawab</small></h2>
+<div class="card"><p>Apakah menampilkan iklan menghasilkan conversion rate lebih tinggi daripada PSA, dan apakah selisihnya cukup besar dan stabil untuk keputusan kampanye?</p></div>
+<h2 id="rp2">2. Data <small>Sumber dan kualitas</small></h2>
+<div class="card">
+<p><b>Sumber:</b> <code>marketing_AB.csv</code> (Kaggle, faviovaz/marketing-ab-testing). Lisensi belum diverifikasi.</p>
+<p><b>Baris:</b> 588.101. Grup valid semua, tidak ada user ganda, tidak ada nilai hilang. Tidak ada baris yang dibuang (lihat <code>outputs/cleaning_log.csv</code>).</p>
+<p><b>Grup:</b> ad 564.577 user (96,0%), psa 23.524 user (4,0%).</p>
+<p><span class="badge-no">SRM gagal</span> chi-square = 497,769, p &lt; 0,0001. Pembagian grup tidak 50:50 dan mekanisme alokasinya tidak diketahui.</p>
+</div>
+<h2 id="rp3">3. Analysis <small>Hasil uji</small></h2>
+<h3>Hasil utama</h3>
+<div class="kpis">
+<div class="card kpi"><span class="v">2,55%</span><span class="l">Conversion rate ad</span><span class="d">564,577 user</span></div>
+<div class="card kpi"><span class="v">1,79%</span><span class="l">Conversion rate psa</span><span class="d">23,524 user</span></div>
+<div class="card kpi t"><span class="v">+0,77</span><span class="l">Selisih (poin)</span><span class="d">CI 95%: 0,60 s.d. 0,94 poin</span></div>
+</div>
+<div class="card"><p>Selisih 0,77 poin, lift relatif 43%, z = 7.37, p &lt; 0,0001. Bootstrap (2.000 resample) memberi CI 0,59 s.d. 0,94 poin. Cohen's h = 0.053 (kecil).</p></div>
+<h3>Segmen hari dalam seminggu (Q3, Q8)</h3>
+<div class="scroll"><table><tr><th>Hari</th><th>CR ad</th><th>CR psa</th><th>Selisih (poin)</th><th>p (Holm)</th><th>Hasil</th></tr>
+<tr><td>Monday</td><td>3,32%</td><td>2,26%</td><td>1,07</td><td>0,0025</td><td><span class="badge-ok">signifikan</span></td></tr><tr><td>Tuesday</td><td>3,04%</td><td>1,44%</td><td>1,60</td><td>&lt; 0,0001</td><td><span class="badge-ok">signifikan</span></td></tr><tr><td>Wednesday</td><td>2,54%</td><td>1,58%</td><td>0,96</td><td>0,0023</td><td><span class="badge-ok">signifikan</span></td></tr><tr><td>Thursday</td><td>2,16%</td><td>2,02%</td><td>0,14</td><td>0,5548</td><td><span class="badge-ns">tidak signifikan</span></td></tr><tr><td>Friday</td><td>2,25%</td><td>1,63%</td><td>0,62</td><td>0,0347</td><td><span class="badge-ok">signifikan</span></td></tr><tr><td>Saturday</td><td>2,13%</td><td>1,40%</td><td>0,73</td><td>0,0299</td><td><span class="badge-ok">signifikan</span></td></tr><tr><td>Sunday</td><td>2,46%</td><td>2,06%</td><td>0,40</td><td>0,3144</td><td><span class="badge-ns">tidak signifikan</span></td></tr>
+</table></div>
+<div class="how">Koreksi Holm dipakai untuk 7 uji. Selisih terbesar di Selasa, Senin, dan Rabu. Kamis dan Minggu tidak signifikan.</div>
+<h3>Intensitas iklan (Q9)</h3>
+<div class="scroll"><table><tr><th>Kuartil total ads</th><th>CR ad</th><th>CR psa</th><th>Selisih (poin)</th><th>p</th><th>Hasil</th></tr>
+<tr><td>Q1</td><td>0,24%</td><td>0,20%</td><td>0,04</td><td>0,5688</td><td><span class="badge-ns">tidak signifikan</span></td></tr><tr><td>Q2</td><td>0,51%</td><td>0,60%</td><td>-0,09</td><td>0,3218</td><td><span class="badge-ns">tidak signifikan</span></td></tr><tr><td>Q3</td><td>1,15%</td><td>1,26%</td><td>-0,11</td><td>0,4518</td><td><span class="badge-ns">tidak signifikan</span></td></tr><tr><td>Q4</td><td>8,31%</td><td>5,30%</td><td>3,01</td><td>&lt; 0,0001</td><td><span class="badge-ok">signifikan</span></td></tr>
+</table></div>
+<div class="callout a"><h4>Temuan penting</h4><p>Selisih hanya muncul di kuartil teratas total ads (CR 8,31% vs 5,30%). Tiga kuartil lainnya tidak berbeda. Efek keseluruhan terutama berasal dari user yang paling sering melihat iklan.</p></div>
+<h3>Sensitivitas (Q13)</h3>
+<div class="card"><p>Buang user dengan total ads di atas P99 (202): selisih 0,79 poin, CI 0,62 s.d. 0,96, p &lt; 0,0001. Kesimpulan tidak berubah.</p></div>
+<h3>Ukuran sampel dan daya (Q7, Q11)</h3>
+<div class="card"><p>Untuk mendeteksi MDE 0,5 poin dari baseline 1,8% dengan power 80% dan alpha 0,05 dibutuhkan <b>6,237 user per grup</b>. Dataset ini jauh di atas angka itu.</p></div>
+<h2 id="rp4">4. Recommendation <small>Tindakan yang disarankan</small></h2>
+<div class="card">
+<p><b>Keputusan:</b> jangan rollout berdasarkan angka ini saja. Iklan tampak lebih baik secara keseluruhan, tetapi ada dua masalah: pembagian grup gagal SRM, dan efek terutama terlihat pada user dengan intensitas iklan tertinggi.</p>
+<p><b>Langkah berikutnya:</b> (1) pastikan mekanisme alokasi grup dengan pemilik data. (2) Jalankan ulang test dengan alokasi acak 50:50 dan catat tanggal serta sumber. (3) Uji apakah efeknya nyata pada intensitas menengah.</p>
+</div>
+<h2 id="rp5">5. Impact <small>Estimasi, bukan hasil pasti</small></h2>
+<div class="card">
+<p><b>Estimated:</b> tambahan konversi per 1 juta user yang melihat iklan dibanding PSA ≈ <b>7,692</b> (CI 95%: 5,951 s.d. 9,434).</p>
+<p>Estimasi per bulan membutuhkan jumlah user per bulan, yang tidak ada di dataset. Angka ini hanya bisa dihitung setelah asumsi trafik ditetapkan. Revenue tidak dihitung karena dataset tidak punya nilai pesanan.</p>
+</div>
+<h2 id="rp6">6. Batasan <small>Hal yang perlu diwaspadai</small></h2>
+<div class="card"><ul>
+<li><b>SRM gagal:</b> pembagian grup 96% vs 4%. Efek bisa dipengaruhi cara grup dibentuk. Ini batasan utama.</li>
+<li><b>Tanpa tanggal dan negara:</b> efek kebaruan, tren waktu, dan segmen negara tidak bisa diuji.</li>
+<li><b>Total ads mungkin dipengaruhi perlakuan:</b> segmen kuartil dipakai untuk deskripsi, bukan kontrol kausal.</li>
+<li><b>Tanpa nilai pembelian:</b> dampak revenue tidak dihitung.</li>
+<li><b>Signifikan tidak sama dengan penting:</b> dengan sampel besar selisih kecil pun signifikan. Besar efek (h = 0,053) kecil.</li>
+<li><b>Lisensi dan sitasi</b> dataset belum diverifikasi.</li>
+</ul></div>
+</div>
+<script>
+document.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){
+var t=b.dataset.t;document.querySelectorAll('.tab').forEach(function(x){var on=x.dataset.t===t;x.classList.toggle('on',on);x.setAttribute('aria-expanded',on)});
+document.querySelectorAll('.links').forEach(function(l){l.hidden=l.dataset.tab!==t});
+document.getElementById(t).hidden=false;document.querySelectorAll('.pane').forEach(function(p){if(p.id!==t)p.hidden=true});
+window.scrollTo(0,0);});});
+function openFromHash(){var h=location.hash.slice(1);if(/^rp/.test(h)){document.querySelector('.tab[data-t="report"]').click()}}
+window.addEventListener('hashchange',openFromHash);openFromHash();
+</script>
+</main>
+</body>
+</html>
