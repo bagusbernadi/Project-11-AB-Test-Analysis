@@ -1,6 +1,6 @@
 # Project 11: A/B Test Analysis
 
-**Status: Report v2 dan DuckDB selesai di branch `project-11-build` (belum digabung ke main).** Halaman project ada di [`design-and-report/index.html`](design-and-report/index.html). Dashboard Streamlit, notebook, dan one-sheet belum dibuat.
+**Status: Report v2, DuckDB, dashboard, dan one-sheet selesai di branch `project-11-build` (belum digabung ke main).** Halaman project ada di [`design-and-report/index.html`](design-and-report/index.html). Notebook belum dibuat.
 
 **Tujuan:** menguji apakah iklan (ad) menghasilkan conversion rate lebih tinggi daripada PSA (layanan masyarakat), dan apakah selisihnya cukup besar dan stabil untuk keputusan kampanye.
 
@@ -29,6 +29,7 @@
 pip install -r requirements.txt
 # letakkan marketing_AB.csv di data/raw/ (tidak di-commit)
 sh scripts/run_all.sh
+streamlit run dashboard/app.py   # dashboard
 ```
 
 ## Struktur
@@ -44,9 +45,12 @@ scripts/
   01_analysis.py                  cleaning, uji, SRM, segmen, sensitivitas
   02_load_duckdb.py               muat ke abtest.duckdb (tidak di-commit) dan view SQL
   03_crosscheck.py                cek silang SQL vs Python (Q14): 36 cek PASS
+  04_one_sheet.py                 one-sheet PNG dan PDF
+dashboard/app.py                  dashboard Streamlit (4 halaman, membaca outputs/)
   run_all.sh
 outputs/                          CSV hasil, log cleaning, dan crosscheck.csv
 sql/01_group_views.sql            view v_group_summary dan v_day_summary
 docs/definitions.md               definisi, asumsi berlabel, uji sensitivitas
+docs/data_dictionary.md           kamus data (mentah, bersih, view, file hasil)
 data/README.md                    sumber, versi, dan lisensi (belum diverifikasi)
 ```

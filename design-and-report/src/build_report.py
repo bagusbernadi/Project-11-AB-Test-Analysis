@@ -21,7 +21,7 @@ from report_lib import D, I, P, audit, gbars, pill, qa, table
 
 # ---------- data ----------
 FILES = {"cleaning_log.csv", "group_summary.csv", "segment_day.csv", "segment_hour.csv",
-         "segment_ads_quartile.csv", "test_results.csv", "crosscheck.csv"}
+         "segment_ads_quartile.csv", "test_results.csv", "crosscheck.csv", "one_sheet.png", "one_sheet.pdf"}
 assert {p.name for p in OUT.iterdir() if p.is_file()} == FILES, "ada file hasil yang belum terdaftar"
 
 cl = pd.read_csv(OUT / "cleaning_log.csv")
