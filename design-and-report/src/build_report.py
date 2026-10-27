@@ -21,7 +21,7 @@ from report_lib import D, I, P, audit, gbars, pill, qa, table
 
 # ---------- data ----------
 FILES = {"cleaning_log.csv", "group_summary.csv", "segment_day.csv", "segment_hour.csv",
-         "segment_ads_quartile.csv", "test_results.csv"}
+         "segment_ads_quartile.csv", "test_results.csv", "crosscheck.csv"}
 assert {p.name for p in OUT.iterdir() if p.is_file()} == FILES, "ada file hasil yang belum terdaftar"
 
 cl = pd.read_csv(OUT / "cleaning_log.csv")
@@ -71,7 +71,7 @@ def sec1():
 
 
 def sec2():
-    warn = {2, 3, 8, 9, 10, 13, 14}
+    warn = {2, 3, 8, 9, 10, 13}
     rows = [
         (1, "Apakah data bersih (grup valid, tanpa user ganda)?", f"Ya. {I(N_BAD)} baris dibuang; semua grup valid dan tidak ada user ganda."),
         (2, "Apakah pembagian grup seimbang 50:50 (SRM)?",
@@ -97,7 +97,7 @@ def sec2():
         (12, "Apakah hasil stabil menurut bootstrap?", "Ya. CI bootstrap hampir sama dengan CI analitik."),
         (13, "Apakah baris outlier (total ads di atas P99) mengubah kesimpulan?",
          f"Tidak. Dengan buang user total ads di atas P99, selisih {pp(SENS['diff'])} poin, p {pv(SENS.p_value)}."),
-        (14, "Apakah hasil SQL (DuckDB) sama dengan Python?", "Belum dijawab. DuckDB dan query SQL belum dibuat."),
+        (14, "Apakah hasil SQL (DuckDB) sama dengan Python?", f"Ya. {I(N_CHECK)} cek silang PASS, {I(N_FAIL)} gagal (toleransi 0)."),
     ]
     chips = '<div class="qchips">' + "".join(
         f'<a class="qc{" w" if n in warn else ""}" href="#rp2">Q{n}</a>' for n in range(1, 15)) + "</div>"
@@ -120,10 +120,10 @@ def sec3():
 def sec4():
     return table(["Tool", "Rancangan", "Dipakai"], [
         ["Python (pandas, SciPy, statsmodels)", "Ya", "Ya"],
-        ["DuckDB + SQL", "Ya", "Belum"],
+        ["DuckDB + SQL", "Ya", "Ya"],
         ["Streamlit (dashboard)", "Ya", "Belum"],
         ["Markdown (README)", "Ya", "Ya, angka dari CSV"],
-    ]) + '<p class="report-note">DuckDB dan Streamlit belum dipakai. Perlu ditambahkan agar sesuai rancangan.</p>'
+    ]) + '<p class="report-note">Streamlit belum dipakai; dashboard belum dibuat.</p>'
 
 
 def sec5():
@@ -132,22 +132,22 @@ def sec5():
         ["2", "Tulis kamus data", verdict("Sebagian")],
         ["3", "Cek kualitas data", verdict("Sesuai")],
         ["4", "Cleaning dengan log", verdict("Sesuai")],
-        ["5", "Muat ke DuckDB", verdict("Belum")],
+        ["5", "Muat ke DuckDB", verdict("Sesuai")],
         ["6", "SRM", verdict("Sesuai")],
         ["7", "Uji selisih", verdict("Sesuai")],
         ["8", "Segmen hari dan intensitas", verdict("Sesuai")],
         ["9", "Bootstrap dan sensitivitas", verdict("Sesuai")],
         ["10", "Estimasi dampak", verdict("Sesuai")],
-        ["11", "Cek silang SQL vs Python", verdict("Belum")],
+        ["11", "Cek silang SQL vs Python", verdict("Sesuai")],
         ["12", "Dashboard, one-sheet, README", verdict("Sebagian")],
-    ]) + '<p class="report-note">Dari 12 langkah rancangan: 8 selesai, 2 sebagian, 2 belum.</p>'
+    ]) + '<p class="report-note">Dari 12 langkah rancangan: 10 selesai, 2 sebagian (kamus data dan dashboard, one-sheet, slide).</p>'
 
 
 def sec6():
     return table(["Output", "Status"], [
         ["Dashboard Streamlit", verdict("Belum")],
         ["One-sheet PDF/PNG", verdict("Belum")],
-        ["Database DuckDB dan folder SQL", verdict("Belum")],
+        ["Database DuckDB dan folder SQL", verdict("Sesuai")],
         ["Modul Python uji A/B", verdict("Sebagian")],
         ["Notebook analisis", verdict("Belum")],
         ["README", verdict("Sesuai")],
@@ -167,14 +167,13 @@ def sec7():
         f'<p><b>Estimated:</b> sekitar {I(float(Z["diff"]) * 1e6)} konversi tambahan per 1 juta user yang melihat iklan dibanding PSA. '
         'Estimasi per bulan belum bisa dihitung karena dataset tidak punya trafik per bulan.</p></div>'
         '<h4>7.3 Success criteria</h4><div class="card"><ul>'
-        '<li>Q1–Q13 terjawab dengan angka dari data: tercapai.</li>'
+        '<li>Q1–Q14 terjawab dengan angka dari data: tercapai.</li>'
         '<li>Aturan uji tertulis sebelum hasil dilihat: tercapai.</li>'
         '<li>SRM dilaporkan jujur: tercapai.</li>'
         '<li>Dashboard bisa dibuka dan keputusan dijelaskan dalam 1 menit: belum.</li></ul></div>'
         '<h4>7.4 Rekomendasi</h4><div class="card">'
         '<p><b>Jangan rollout dari angka ini saja.</b> Pastikan mekanisme alokasi grup dengan pemilik data, lalu jalankan ulang test dengan alokasi acak 50:50 dan catat sumber serta tanggalnya.</p></div>'
         '<h4>7.5 Saran perbaikan</h4><div class="card"><ul>'
-        '<li>Buat DuckDB dan query SQL, lalu cek silang Q14.</li>'
         '<li>Buat dashboard Streamlit dan one-sheet.</li>'
         '<li>Ubah angka README agar diambil dari CSV.</li>'
         '<li>Tambahkan kolom tanggal dan negara jika ada, agar Q3 dan Q8 bisa dijawab penuh.</li></ul></div>'
@@ -186,6 +185,9 @@ def sec7():
         '<li><b>Lisensi belum diverifikasi.</b></li></ul></div>'
     )
 
+
+N_CHECK = int(pd.read_csv(OUT / "crosscheck.csv").shape[0])
+N_FAIL = int((pd.read_csv(OUT / "crosscheck.csv").hasil == "FAIL").sum())
 
 TITLES = [
     ("Data yang berhasil didapatkan", "Isi data mentah, tabel di database, dan data hasil analisis", sec1),
