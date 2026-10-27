@@ -148,12 +148,12 @@ def sec6():
         ["Dashboard Streamlit (4 halaman)", verdict("Sesuai")],
         ["One-sheet PDF/PNG", verdict("Sesuai")],
         ["Database DuckDB dan folder SQL", verdict("Sesuai")],
-        ["Modul Python uji A/B", verdict("Sebagian")],
-        ["Notebook analisis", verdict("Belum")],
-        ["README", verdict("Sesuai")],
+        ["Modul Python uji A/B (src/abtest.py)", verdict("Sesuai")],
+        ["Notebook analisis (notebooks/analysis.ipynb)", verdict("Sesuai")],
+        ["Slide presentasi (opsional, 7 slide)", verdict("Sesuai")],
+                ["README", verdict("Sesuai")],
         ["Repositori GitHub", verdict("Sesuai")],
-        ["Slide (opsional)", verdict("Belum")],
-    ]) + '<p class="report-note">Notebook, modul Python yang dipisah dari skrip, dan slide belum dibuat.</p>'
+            ]) + '<p class="report-note">Semua output rancangan sudah dibuat.</p>'
 
 
 def sec7():
@@ -174,7 +174,7 @@ def sec7():
         '<h4>7.4 Rekomendasi</h4><div class="card">'
         '<p><b>Jangan rollout dari angka ini saja.</b> Pastikan mekanisme alokasi grup dengan pemilik data, lalu jalankan ulang test dengan alokasi acak 50:50 dan catat sumber serta tanggalnya.</p></div>'
         '<h4>7.5 Saran perbaikan</h4><div class="card"><ul>'
-        '<li>Buat notebook analisis Q1–Q14 dan modul Python yang bisa dipakai ulang.</li>'
+        '<li>Hubungkan skrip 01 ke src/abtest.py agar satu sumber rumus.</li>'
         '<li>Ubah angka README agar diambil dari CSV.</li>'
         '<li>Tambahkan kolom tanggal dan negara jika ada, agar Q3 dan Q8 bisa dijawab penuh.</li></ul></div>'
         '<h4>7.6 Batasan</h4><div class="card"><ul>'
@@ -182,7 +182,7 @@ def sec7():
         '<li><b>Tanpa tanggal dan negara:</b> efek kebaruan dan tren waktu tidak bisa diuji.</li>'
         '<li><b>Total ads mungkin dipengaruhi perlakuan:</b> dipakai untuk deskripsi, bukan kontrol kausal.</li>'
         '<li><b>Tanpa nilai pembelian:</b> dampak revenue tidak dihitung.</li>'
-        '<li><b>Lisensi belum diverifikasi.</b></li></ul></div>'
+        '<li><b>Lisensi belum diverifikasi.</b> Halaman Kaggle tidak bisa diakses dari sandbox.</li></ul></div>'
     )
 
 

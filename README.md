@@ -1,6 +1,6 @@
 # Project 11: A/B Test Analysis
 
-**Status: Report v2, DuckDB, dashboard, dan one-sheet selesai di branch `project-11-build` (belum digabung ke main).** Halaman project ada di [`design-and-report/index.html`](design-and-report/index.html). Notebook belum dibuat.
+**Status: semua output rancangan selesai di branch `project-11-build` (belum digabung ke main).** Halaman project: [`design-and-report/index.html`](design-and-report/index.html). Notebook: [`notebooks/analysis.ipynb`](notebooks/analysis.ipynb). Dashboard: `dashboard/app.py`. Slide: [`slides/presentasi.pptx`](slides/presentasi.pptx). Lisensi dataset masih belum diverifikasi.
 
 **Tujuan:** menguji apakah iklan (ad) menghasilkan conversion rate lebih tinggi daripada PSA (layanan masyarakat), dan apakah selisihnya cukup besar dan stabil untuk keputusan kampanye.
 
@@ -22,15 +22,16 @@
 - Dataset tanpa tanggal dan negara. Efek kebaruan dan segmen negara tidak bisa diuji.
 - `total ads` mungkin dipengaruhi perlakuan. Dipakai untuk deskripsi, bukan kontrol kausal.
 - Tanpa nilai pembelian, dampak revenue tidak dihitung.
-- Lisensi dan sitasi dataset belum diverifikasi (lihat `data/README.md`).
+- Lisensi dan sitasi dataset belum diverifikasi. Halaman Kaggle tidak bisa diakses dari sandbox (lihat `data/README.md`).
 
 ## Menjalankan
 ```bash
 pip install -r requirements.txt
 # letakkan marketing_AB.csv di data/raw/ (tidak di-commit)
-sh scripts/run_all.sh
-streamlit run dashboard/app.py   # dashboard
+sh scripts/run_all.sh                 # semua pipeline, notebook, slide, dan report
+streamlit run dashboard/app.py        # dashboard
 ```
+Pipeline sudah dijalankan dua kali dan hasilnya identik (byte-for-byte).
 
 ## Struktur
 ```
@@ -46,6 +47,11 @@ scripts/
   02_load_duckdb.py               muat ke abtest.duckdb (tidak di-commit) dan view SQL
   03_crosscheck.py                cek silang SQL vs Python (Q14): 36 cek PASS
   04_one_sheet.py                 one-sheet PNG dan PDF
+  05_build_notebook.py            bangun notebooks/analysis.ipynb (dieksekusi oleh run_all.sh)
+  06_slides.py                    slides/presentasi.pptx (7 slide)
+src/abtest.py                     modul uji A/B yang bisa dipakai ulang
+notebooks/analysis.ipynb          analisis Q1–Q14 dengan output tersimpan
+slides/presentasi.pptx            slide presentasi (opsional)
 dashboard/app.py                  dashboard Streamlit (4 halaman, membaca outputs/)
   run_all.sh
 outputs/                          CSV hasil, log cleaning, dan crosscheck.csv

@@ -31,7 +31,8 @@ if page == "Ringkasan Hasil":
     c2.metric("CR psa", f"{grp.loc['psa', 'conv_rate']*100:.2f}%")
     c3.metric("Selisih (poin)", f"{Z['diff']*100:.2f}", f"CI 95% {Z.ci_low*100:.2f} s.d. {Z.ci_high*100:.2f}")
     st.caption(f"p-value {Z.p_value:.2e}. Cohen's h = {Z.cohens_h:.3f} (kecil). Angka dari outputs/test_results.csv.")
-    st.info(f"Estimasi: sekitar {Z['diff']*1e6:,.0f} konversi tambahan per 1 juta user (estimated, tanpa data trafik per bulan).".replace(",", "."))
+    est = f"{Z['diff']*1e6:,.0f}".replace(",", ".")
+    st.info(f"Estimasi: sekitar {est} konversi tambahan per 1 juta user (estimated, tanpa data trafik per bulan).")
 
 elif page == "Kualitas Eksperimen":
     st.title("Kualitas eksperimen")
@@ -44,6 +45,8 @@ elif page == "Kualitas Eksperimen":
 elif page == "Segmen & Waktu":
     st.title("Segmen hari dan intensitas iklan")
     s = seg.copy()
+    s["urut"] = s["segmen"].map({k: i for i, k in enumerate(NAMA)})
+    s = s.sort_values("urut")
     s["Hari"] = s["segmen"].map(NAMA)
     s["Selisih (poin %)"] = (s["diff"] * 100).round(2)
     s["Signifikan (Holm)"] = s["p_holm"] < 0.05
