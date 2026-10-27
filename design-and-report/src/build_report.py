@@ -218,19 +218,7 @@ def sec2():
         cap("Tabel 2.7a", "Ringkasan cek silang (detail per cek ada di <code>crosscheck.csv</code>).")
         + table(["Jenis cek", "Jumlah", "PASS", "FAIL"], [["SQL vs Python", I(N_CHECK), I(N_CHECK - N_FAIL), I(N_FAIL)]]))
 
-    spread = (seg["diff"].min() * 100, seg["diff"].max() * 100)
-    hyp = [
-        ["1", "Iklan tidak meningkatkan conversion rate dibanding PSA.", pill("Tidak terbukti", "d"),
-         f"Selisih {pp(Z['diff'])} poin, p {pv(Z.p_value)} (Tabel 2.2a)."],
-        ["2", "Pembagian grup seimbang 50:50.", pill("Tidak terbukti", "d"),
-         f"SRM gagal: ad {P(N_AD / N_CLEAN, 1)}, psa {P(N_PSA / N_CLEAN, 1)}, p {pv(SRM.p_value)} (Tabel 2.1a)."],
-        ["3", "Selisih tidak berbeda antar hari dalam seminggu.", pill("Sebagian", "p"),
-         f"Selisih {D(spread[0], 2)} s.d. {D(spread[1], 2)} poin; {I(len(_sig))} dari 7 hari signifikan setelah Bonferroni. Uji interaksi formal belum dilakukan (Tabel 2.3b)."],
-        ["4", "Selisih tidak bergantung pada intensitas iklan.", pill("Tidak terbukti", "d"),
-         f"Hanya kuartil teratas yang berbeda: {pp(Q4['diff'])} poin, p {pv(Q4.p_value)} (Tabel 2.4a)."],
-        ["5", "Baris outlier (total ads di atas P99) tidak mengubah kesimpulan.", pill("Terbukti"),
-         f"Selisih tetap {pp(SENS['diff'])} poin, p {pv(SENS.p_value)} (Tabel 2.6a)."],
-    ]
+    hyp = hyp_rows()
     out = ('<div class="callout a"><b>14 pertanyaan dijawab</b> (8 hijau, 6 kuning = terjawab dengan catatan). '
            'Pertanyaan utama project dijawab di bagian 7.</div>')
     out = out.replace("(8 hijau, 6 kuning", f"({I(14 - len(warn))} hijau, {I(len(warn))} kuning")
@@ -243,53 +231,133 @@ def sec2():
     return out
 
 
+def exists(rel):
+    return (ROOT / rel).exists()
+
+
+def hyp_rows():
+    spread = (seg["diff"].min() * 100, seg["diff"].max() * 100)
+    return [
+        ["1", "Iklan tidak meningkatkan conversion rate dibanding PSA.", pill("Tidak terbukti", "d"),
+         f"Selisih {pp(Z['diff'])} poin, p {pv(Z.p_value)} (Tabel 2.2a)."],
+        ["2", "Pembagian grup seimbang 50:50.", pill("Tidak terbukti", "d"),
+         f"SRM gagal: ad {P(N_AD / N_CLEAN, 1)}, psa {P(N_PSA / N_CLEAN, 1)}, p {pv(SRM.p_value)} (Tabel 2.1a)."],
+        ["3", "Selisih tidak berbeda antar hari dalam seminggu.", pill("Sebagian", "p"),
+         f"Selisih {D(spread[0], 2)} s.d. {D(spread[1], 2)} poin; {I(len(_sig))} dari 7 hari signifikan setelah Bonferroni. Uji interaksi formal belum dilakukan (Tabel 2.3b)."],
+        ["4", "Selisih tidak bergantung pada intensitas iklan.", pill("Tidak terbukti", "d"),
+         f"Hanya kuartil teratas yang berbeda: {pp(Q4['diff'])} poin, p {pv(Q4.p_value)} (Tabel 2.4a)."],
+        ["5", "Baris outlier (total ads di atas P99) tidak mengubah kesimpulan.", pill("Terbukti"),
+         f"Selisih tetap {pp(SENS['diff'])} poin, p {pv(SENS.p_value)} (Tabel 2.6a)."],
+    ]
+
+
 def sec3():
-    return table(["Aspek", "Rancangan", "Realisasi"], [
-        ["Jumlah baris", "±294 ribu", f"{I(N_RAW)} (dataset lebih besar)"],
-        ["Grup", "Halaman baru vs lama, 50:50", f"Iklan vs PSA, {P(N_AD / N_CLEAN, 1)} vs {P(N_PSA / N_CLEAN, 1)}"],
-        ["Kolom", "5 kolom + file negara", "6 kolom, tanpa negara dan tanggal"],
-        ["Kualitas", "Ada baris bermasalah", f"{I(N_BAD)} baris dibuang; data bersih"],
-        ["Lisensi", "Belum diverifikasi", "Belum diverifikasi"],
-    ])
+    hyp = hyp_rows()
+    _v = [h[2] for h in hyp]
+    assert (sum('Tidak terbukti' in v for v in _v), sum('Sebagian' in v for v in _v), sum('>Terbukti<' in v for v in _v)) == (3, 1, 1), 'ringkasan hipotesis tidak cocok'
+    rows = [
+        ["Sumber", 'Kaggle, "Marketing A/B Testing" (faviovaz/marketing-ab-testing)',
+         "File <code>marketing_AB.csv</code> dilampirkan pengguna karena sandbox tidak bisa mengunduh. Versi dan tanggal akses belum dicatat.", verdict("Sesuai")],
+        ["Ukuran", f"{I(N_RAW)} baris, satu baris per user", f"{I(N_RAW)} baris mentah, {I(N_CLEAN)} dipakai ({I(N_BAD)} dibuang)", verdict("Sesuai")],
+        ["Kolom", "6 kolom, tanpa tanggal dan negara", "6 kolom, tanpa tanggal dan negara", verdict("Sesuai")],
+        ["Lisensi dan sitasi", "Belum diverifikasi", "Belum diverifikasi (halaman Kaggle tidak bisa diakses dari sandbox)", verdict("Belum dikerjakan")],
+        ["Tabel", "users, group_summary, segment_day, test_results",
+         "<code>users</code> tabel DuckDB; <code>group_summary</code> dan <code>segment_day</code> view SQL dan CSV; <code>test_results</code> CSV",
+         verdict("Sesuai + penyesuaian")],
+    ] + [[f"Hipotesis {h[0]}", h[1], h[3], h[2]] for h in hyp]
+    return ('<div class="card"><p><b>Jawaban singkat:</b> sumber, ukuran, dan kolom sesuai rancangan. Bentuk tabel disesuaikan (view dan CSV). '
+            'Dari 5 hipotesis, 1 terbukti, 1 sebagian, dan 3 tidak terbukti; hasil ditulis apa adanya.</p></div>'
+            + table(["Aspek", "Rancangan", "Realisasi", "Verdict"], rows))
 
 
 def sec4():
-    return table(["Tool", "Rancangan", "Dipakai"], [
-        ["Python (pandas, SciPy)", "Ya", "Ya"],
-        ["DuckDB + SQL", "Ya", "Ya"],
-        ["Streamlit (dashboard)", "Ya", "Ya"],
-        ["Markdown (README)", "Ya", "Ya, angka dari CSV"],
-    ]) + '<p class="report-note">Semua tool rancangan dipakai. Notebook belum dibuat.</p>'
+    return (table(["Tool", "Rancangan", "Realisasi", "Verdict"], [
+        ["Python (pandas, NumPy, SciPy)", "Uji z, CI Wilson, Cohen's h, bootstrap, Bonferroni", "Dipakai (SciPy untuk uji; Bonferroni dihitung langsung)", verdict("Sesuai")],
+        ["DuckDB + SQL", "Opsional, untuk cek silang Q14", f"Dipakai; {I(N_CHECK)} cek silang SQL vs Python", verdict("Sesuai")],
+        ["Streamlit", "Dashboard (belum dibuat saat rancangan)", "Dashboard 4 halaman dibuat; belum dipublikasikan", verdict("Sesuai")],
+        ["Markdown", "README dan laporan, angka dari CSV", "README dibuat oleh skrip 07 dari CSV", verdict("Sesuai")],
+        ["Jupyter (nbconvert)", "(tidak ada di rancangan)", "Notebook analisis Q1 sampai Q14, dieksekusi tanpa error", verdict("Sesuai + tambahan")],
+        ["python-pptx, matplotlib", "(tidak ada di rancangan)", "Slide 7 halaman dan one-sheet PDF/PNG", verdict("Sesuai + tambahan")],
+    ]) + '<p class="report-note">Semua tool rancangan dipakai. Tool tambahan hanya untuk output yang sudah ada di rancangan (notebook, slide, one-sheet).</p>')
+
+
+STEPS = [
+    ("1", "Tulis rancangan dan aturan uji", "Sesuai"), ("2", "Tulis kamus data", "Sesuai"), ("3", "Cek kualitas data", "Sesuai"),
+    ("4", "Cleaning dengan log", "Sesuai"), ("5", "Muat ke DuckDB (opsional)", "Sesuai"), ("6", "SRM", "Sesuai"),
+    ("7", "Uji selisih (uji z, CI Wilson, Cohen's h, power)", "Sesuai"),
+    ("8", "Segmen (hari dan kuartil total ads, koreksi Bonferroni)", "Sesuai"),
+    ("9", "Bootstrap dan sensitivitas", "Sesuai"), ("10", "Estimasi dampak", "Sesuai"),
+    ("11", "Cek silang SQL vs Python", "Sesuai"), ("12", "Dashboard, one-sheet, dan README", "Sesuai"),
+]
+
+RENAMES = [  # (rancangan, realisasi: path dipisah koma, ada di repo)
+    ("(tidak ada di rancangan)", "project/code/common.py"),
+    ("Cleaning dan muat ke DuckDB (langkah 3 sampai 5)", "project/code/1-data-preparation/python/01_clean_load.py"),
+    ("Uji selisih, segmen, bootstrap, sensitivitas (langkah 6 sampai 10)", "project/code/2-analysis/python/02_tests.py"),
+    ("Modul Python uji A/B (bagian 7)", "project/code/2-analysis/python/abtest.py"),
+    ("Cek silang SQL vs Python (langkah 11)", "project/code/2-analysis/python/03_crosscheck.py"),
+    ("Folder SQL (bagian 7)", "project/code/2-analysis/sql/01_group_views.sql"),
+    ("One-sheet (langkah 12)", "project/code/3-presentation/python/04_one_sheet.py"),
+    ("Notebook analisis (bagian 7)", "project/code/3-presentation/python/05_build_notebook.py"),
+    ("Slide (opsional, bagian 7)", "project/code/3-presentation/python/06_slides.py"),
+    ("README (langkah 12)", "project/code/3-presentation/python/07_build_readme.py"),
+    ("Dashboard Streamlit (langkah 12)", "project/code/3-presentation/streamlit/app.py"),
+    ("(tidak ada di rancangan)", "project/code/run_all.sh"),
+    ("Kamus data (langkah 2)", "project/docs/data_dictionary.md"),
+    ("(tidak ada di rancangan)", "project/docs/definitions.md"),
+    ("Tabel users, group_summary, segment_day, test_results (bagian 4)", "project/results/2-analysis/group_summary.csv, project/results/2-analysis/segment_day.csv, project/results/2-analysis/test_results.csv"),
+]
 
 
 def sec5():
-    return table(["No", "Langkah rancangan", "Status"], [
-        ["1", "Tulis rancangan dan aturan uji", verdict("Sesuai")],
-        ["2", "Tulis kamus data", verdict("Sesuai")],
-        ["3", "Cek kualitas data", verdict("Sesuai")],
-        ["4", "Cleaning dengan log", verdict("Sesuai")],
-        ["5", "Muat ke DuckDB", verdict("Sesuai")],
-        ["6", "SRM", verdict("Sesuai")],
-        ["7", "Uji selisih", verdict("Sesuai")],
-        ["8", "Segmen hari dan intensitas (koreksi Bonferroni)", verdict("Sesuai")],
-        ["9", "Bootstrap dan sensitivitas", verdict("Sesuai")],
-        ["10", "Estimasi dampak", verdict("Sesuai")],
-        ["11", "Cek silang SQL vs Python", verdict("Sesuai")],
-        ["12", "Dashboard, one-sheet, README", verdict("Sesuai")],
-    ]) + '<p class="report-note">Dari 12 langkah rancangan: 12 selesai. Notebook dan slide belum termasuk langkah.</p>'
+    for _, real in RENAMES:
+        for f in real.split(","):
+            assert exists(f.strip()), f"file di tabel perubahan nama tidak ada: {f}"
+    t = table(["No", "Langkah rancangan", "Status"], [[n, s, verdict(v)] for n, s, v in STEPS])
+    imp = ('<div class="card"><b>Penyesuaian dan improvisasi yang tidak ada di rancangan</b><ul>'
+           '<li><b>Metode:</b> CI selisih memakai Newcombe (berbasis Wilson) dan segmen hari memakai koreksi Bonferroni. Rancangan awal memakai Wald dan Holm; pane Design diperbarui atas keputusan pengguna setelah hasil terlihat.</li>'
+           '<li><b>Hipotesis:</b> hipotesis 3 dan 4 pada rancangan v2 berbeda dari rancangan awal (v1). Revisi disetujui pengguna sebelum analisis.</li>'
+           '<li><b>Ukuran dan batas buatan sendiri:</b> MDE 0,5 poin, batas outlier P99, alpha 0,05. Semuanya berlabel asumsi di <code>project/docs/definitions.md</code>; P99 diuji sensitivitasnya (S1).</li>'
+           '<li><b>Sumber data:</b> file dilampirkan pengguna (sandbox tidak bisa mengunduh dari Kaggle).</li>'
+           '<li><b>Tambahan:</b> segmen per jam (<code>segment_hour.csv</code>), notebook, slide, dan modul <code>abtest.py</code>.</li>'
+           '<li><b>Walk-forward tidak berlaku:</b> tidak ada tanggal atau lot.</li></ul></div>')
+    rn = table(["Rancangan", "Realisasi"], [[a, "<code>" + "</code>, <code>".join(x.strip() for x in b.split(",")) + "</code>"] for a, b in RENAMES])
+    return (t + '<p class="report-note">Dari 12 langkah rancangan: 12 dikerjakan. Nama dan lokasi file berbeda dari rancangan (tabel di bawah).</p>' + imp
+            + '<h4>Perubahan nama dan lokasi file terhadap rancangan</h4>' + rn)
+
+
+DOCS = [  # (dokumen, label, path, committed)
+    ("Dashboard Streamlit (4 halaman)", "Utama", "project/code/3-presentation/streamlit/app.py", True),
+    ("One-sheet PDF", "Utama", "project/results/3-presentation/one_sheet.pdf", True),
+    ("One-sheet PNG", "Utama", "project/results/3-presentation/one_sheet.png", True),
+    ("Database DuckDB", "Utama", "project/abtest.duckdb", False),
+    ("Folder SQL", "Utama", "project/code/2-analysis/sql/01_group_views.sql", True),
+    ("Modul Python uji A/B", "Utama", "project/code/2-analysis/python/abtest.py", True),
+    ("Notebook analisis Q1 sampai Q14", "Utama", "project/results/3-presentation/analysis.ipynb", True),
+    ("README", "Utama", "README.md", True),
+    ("Slide presentasi", "Opsional", "project/results/3-presentation/presentasi.pptx", True),
+    ("Data mentah", "-", "project/data/raw/marketing_AB.csv", False),
+]
 
 
 def sec6():
-    return table(["Output", "Status"], [
-        ["Dashboard Streamlit (4 halaman)", verdict("Sesuai")],
-        ["One-sheet PDF/PNG", verdict("Sesuai")],
-        ["Database DuckDB dan folder SQL", verdict("Sesuai")],
-        ["Modul Python uji A/B (2-analysis/python/abtest.py)", verdict("Sesuai")],
-        ["Notebook analisis (3-presentation/analysis.ipynb)", verdict("Sesuai")],
-        ["Slide presentasi (opsional, 7 slide)", verdict("Sesuai")],
-                ["README", verdict("Sesuai")],
-        ["Repositori GitHub", verdict("Sesuai")],
-            ]) + '<p class="report-note">Semua output rancangan sudah dibuat.</p>'
+    for _, _, path, committed in DOCS:
+        if committed:
+            assert exists(path), path
+    out = table(["Output", "Label", "Status", "Bukti"], [
+        ["Dashboard Streamlit (4 halaman)", "Utama", pill("Tercapai"), "Dibuat dan lolos uji AppTest; belum dipublikasikan"],
+        ["One-sheet PDF/PNG", "Utama", pill("Tercapai"), "<code>one_sheet.pdf</code>, <code>one_sheet.png</code>"],
+        ["Database DuckDB dan folder SQL", "Utama", pill("Tercapai"), f"{I(N_CHECK)} cek silang SQL vs Python"],
+        ["Modul Python uji A/B", "Utama", pill("Tercapai"), "<code>abtest.py</code>"],
+        ["Notebook analisis Q1 sampai Q14", "Utama", pill("Tercapai"), "<code>analysis.ipynb</code>, dieksekusi tanpa error"],
+        ["README", "Utama", pill("Tercapai"), "Angka dibuat dari CSV oleh skrip 07"],
+        ["Repositori GitHub", "Utama", pill("Tercapai"), "Struktur standar, data mentah tidak di-commit"],
+        ["Slide presentasi (7 slide)", "Opsional", pill("Tercapai"), "<code>presentasi.pptx</code>"],
+    ])
+    docs = table(["Dokumen", "Label", "File", "Status"], [
+        [d, l, f"<code>{p}</code>", pill("Ada") if c else pill("Tidak di-commit", "p")] for d, l, p, c in DOCS])
+    return (out + '<p class="report-note">Semua output rancangan sudah dibuat. Dashboard belum dipublikasikan (butuh akun Streamlit Community Cloud).</p>'
+            + '<h4>Daftar dokumen pada rancangan vs repositori</h4>' + docs)
 
 
 def sec7():
@@ -302,11 +370,13 @@ def sec7():
         '<h4>7.2 Impact</h4><div class="card">'
         f'<p><b>Estimated:</b> sekitar {I(float(Z["diff"]) * 1e6)} konversi tambahan per 1 juta user yang melihat iklan dibanding PSA. '
         'Estimasi per bulan belum bisa dihitung karena dataset tidak punya trafik per bulan.</p></div>'
-        '<h4>7.3 Success criteria</h4><div class="card"><ul>'
-        '<li>Q1–Q14 terjawab dengan angka dari data: tercapai.</li>'
-        '<li>Aturan uji tertulis sebelum hasil dilihat: tercapai.</li>'
-        '<li>SRM dilaporkan jujur: tercapai.</li>'
-        '<li>Dashboard bisa dibuka dan keputusan dijelaskan dalam 1 menit: tercapai (cek manual belum dilakukan).</li></ul></div>'
+        '<h4>7.3 Success criteria</h4>'
+        + table(["Kriteria (Design, bagian 8)", "Status", "Bukti"], [
+            ["Q1 sampai Q13 terjawab dengan angka dari data", pill("Tercapai"), f"{I(14)} dari {I(14)} pertanyaan terjawab, termasuk Q14 (cek silang)."],
+            ["Aturan uji tertulis sebelum hasil dilihat dan tidak diubah", pill("Sebagian", "p"), "Alpha, power, dan MDE tertulis lebih dulu. Metode CI dan koreksi diperbarui setelah hasil terlihat (lihat bagian 5)."],
+            ["SRM dilaporkan jujur, termasuk kegagalannya", pill("Tercapai"), f"SRM gagal dilaporkan di Tabel 2.1a dan bagian 7.1 (p {pv(SRM.p_value)})."],
+            ["Pembaca awam bisa menyebut keputusan dan alasannya dalam 1 menit", pill("Sebagian", "p"), "Belum diuji ke pembaca awam."],
+        ]) + '<p class="report-note"><b>Hasil:</b> 2 dari 4 kriteria tercapai penuh, 2 sebagian.</p>'
         '<h4>7.4 Rekomendasi</h4><div class="card">'
         '<p><b>Jangan rollout dari angka ini saja.</b> Pastikan mekanisme alokasi grup dengan pemilik data, lalu jalankan ulang test dengan alokasi acak 50:50 dan catat sumber serta tanggalnya.</p></div>'
         '<h4>7.5 Saran perbaikan</h4><div class="card"><ul>'
@@ -341,10 +411,32 @@ STATIC = {f"{a}.{b}" for a in range(1, 8) for b in range(1, 10)} | {
     "0", "50", "0,05", "0,0001", "0,5", "1,96", "80", "95", "2.000", "100", "1.000", "2", "3", "4", "5", "6", "7", "8", "9", "294"}
 
 
+def evq():
+    rows = [
+        ["1", "Apakah data yang didapat sesuai rancangan dan bersih?", verdict("Sesuai"),
+         f'{I(N_CLEAN)} baris dipakai dari {I(N_RAW)} mentah; {I(N_BAD)} dibuang. <a href="#rp1">Lihat bagian 1</a>.'],
+        ["2", "Apakah business question terjawab?", verdict("Sesuai"),
+         f'{I(14)} dari {I(14)} pertanyaan terjawab, {I(6)} dengan catatan. <a href="#rp2">Lihat bagian 2</a>.'],
+        ["3", "Apakah dataset sesuai Design Project?", verdict("Sesuai + penyesuaian"),
+         f'Sumber, ukuran, dan kolom sesuai; lisensi belum diverifikasi. Hipotesis: 1 terbukti, 1 sebagian, 3 tidak terbukti. <a href="#rp3">Lihat bagian 3</a>.'],
+        ["4", "Apakah tools yang digunakan sesuai?", verdict("Sesuai + tambahan"),
+         'Python, DuckDB + SQL, Streamlit, dan Markdown dipakai; Jupyter dan python-pptx ditambahkan. <a href="#rp4">Lihat bagian 4</a>.'],
+        ["5", "Apakah alur pengerjaan sesuai Design Project?", verdict("Sesuai + penyesuaian"),
+         f'{I(12)} dari {I(12)} langkah dikerjakan; nama dan lokasi file berbeda dari rancangan. <a href="#rp5">Lihat bagian 5</a>.'],
+        ["6", "Apakah project output tercapai?", verdict("Sebagian"),
+         'Semua output dibuat; dashboard belum dipublikasikan. <a href="#rp6">Lihat bagian 6</a>.'],
+        ["7", "Apakah hasil menjawab pertanyaan utama?", verdict("Sebagian"),
+         f'Iklan lebih tinggi {pp(Z["diff"])} poin dari PSA, tetapi SRM gagal sehingga bukti kausal lemah. <a href="#rp7">Lihat bagian 7</a>.'],
+    ]
+    return ('<div class="callout g"><b>Report Project versi 2: evaluasi hasil terhadap Design Project.</b> '
+            f'{I(14)} pertanyaan dijawab dengan {I(N_CHECK)} cek silang. Data pada project ini adalah dataset publik, bukan simulasi.</div>'
+            '<div class="scroll"><table class="evq"><tr><th>No</th><th>Pertanyaan evaluasi</th><th>Verdict</th><th>Ringkasan</th></tr>'
+            + "".join(f'<tr><td><span class="en">{a}</span></td><td>{esc(b)}</td><td>{c}</td><td>{d}</td></tr>' for a, b, c, d in rows)
+            + "</table></div>")
+
+
 def report_pane():
-    parts = ['<div class="pane" id="report" data-tab="report" hidden>\n']
-    parts.append('<div class="callout a"><b>Report Project versi 2: evaluasi hasil terhadap Design Project.</b> '
-                 'Data pada project ini adalah dataset publik, bukan simulasi.</div>')
+    parts = ['<div class="pane" id="report" data-tab="report" hidden>\n', evq()]
     for i, (t, sub, fn) in enumerate(TITLES, 1):
         parts.append(f'<h2 id="rp{i}">{i}. {esc(t)}<small>{esc(sub)}</small></h2>')
         parts.append(fn())
@@ -404,9 +496,8 @@ def main():
               '<div class="tags"><span class="tlab">Kategori:</span><span class="tag a">Rancangan v2 + Report v2</span>'
               '<span class="tag c1">Marketing</span><span class="tag c2">Dataset publik</span><span class="tag c3">Statistik</span></div></header>')
     nav = ('<nav aria-label="Project navigation"><button type="button" class="tab on" data-t="design" aria-expanded="true" aria-controls="design">Design Project</button>'
-           + NAV_DESIGN +
            '<button type="button" class="tab" data-t="report" aria-expanded="false" aria-controls="report">Report Project</button>'
-           + NAV_REPORT + "</nav>")
+           + NAV_DESIGN + NAV_REPORT + "</nav>")
     design = (HERE / "design_pane.html").read_text(encoding="utf-8")
     report = report_pane()
     back = ('<a href="https://bagusbernadi.github.io/" style="display:inline-block;margin:12px 16px;font:600 14px/1.4 '
