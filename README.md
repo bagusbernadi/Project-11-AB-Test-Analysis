@@ -11,7 +11,7 @@
 | Kategori | Marketing |
 | Tingkat | Menengah |
 | Data | Dataset publik `marketing_AB.csv` (588.101 user) |
-| Tools | Python (pandas, SciPy, statsmodels), DuckDB + SQL, Streamlit |
+| Tools | Python (pandas, SciPy), DuckDB + SQL, Streamlit |
 
 ## 1. Problem
 Apakah menampilkan iklan menghasilkan conversion rate lebih tinggi daripada PSA, dan apakah selisihnya cukup besar dan stabil untuk keputusan kampanye?

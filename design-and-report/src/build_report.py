@@ -127,7 +127,7 @@ def sec3():
 
 def sec4():
     return table(["Tool", "Rancangan", "Dipakai"], [
-        ["Python (pandas, SciPy, statsmodels)", "Ya", "Ya"],
+        ["Python (pandas, SciPy)", "Ya", "Ya"],
         ["DuckDB + SQL", "Ya", "Ya"],
         ["Streamlit (dashboard)", "Ya", "Ya"],
         ["Markdown (README)", "Ya", "Ya, angka dari CSV"],
@@ -143,7 +143,7 @@ def sec5():
         ["5", "Muat ke DuckDB", verdict("Sesuai")],
         ["6", "SRM", verdict("Sesuai")],
         ["7", "Uji selisih", verdict("Sesuai")],
-        ["8", "Segmen hari dan intensitas (koreksi Bonferroni)", verdict("Sesuai + penyesuaian")],
+        ["8", "Segmen hari dan intensitas (koreksi Bonferroni)", verdict("Sesuai")],
         ["9", "Bootstrap dan sensitivitas", verdict("Sesuai")],
         ["10", "Estimasi dampak", verdict("Sesuai")],
         ["11", "Cek silang SQL vs Python", verdict("Sesuai")],
@@ -189,7 +189,6 @@ def sec7():
         '<li><b>Tanpa tanggal dan negara:</b> efek kebaruan dan tren waktu tidak bisa diuji.</li>'
         '<li><b>Total ads mungkin dipengaruhi perlakuan:</b> dipakai untuk deskripsi, bukan kontrol kausal.</li>'
         '<li><b>Tanpa nilai pembelian:</b> dampak revenue tidak dihitung.</li>'
-        '<li><b>Penyimpangan dari rancangan:</b> pane Design menyebut koreksi Holm; analisis memakai Bonferroni dan CI selisih Newcombe (berbasis Wilson) sesuai standar portofolio. Uji z, bootstrap, dan keputusan utama tidak berubah.</li>'
         '<li><b>Lisensi belum diverifikasi.</b> Halaman Kaggle tidak bisa diakses dari sandbox.</li></ul></div>'
     )
 

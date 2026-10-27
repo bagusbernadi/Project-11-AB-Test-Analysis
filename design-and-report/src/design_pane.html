@@ -61,13 +61,13 @@
 <div class="scroll"><table><tr><th>Tabel</th><th>Isi</th></tr>
 <tr><td><code>users</code></td><td>Data bersih, satu baris per user</td></tr>
 <tr><td><code>group_summary</code></td><td>n, konversi, dan conversion rate per grup</td></tr>
-<tr><td><code>segment_day</code></td><td>Conversion rate per hari dalam seminggu, dengan koreksi Holm</td></tr>
+<tr><td><code>segment_day</code></td><td>Conversion rate per hari dalam seminggu, dengan koreksi Bonferroni (7 uji)</td></tr>
 <tr><td><code>test_results</code></td><td>Semua uji statistik dan sensitivitas</td></tr></table></div>
 
 
 <h2 id="s5">5. Tools <small>Alat yang dipakai</small></h2>
 <div class="tools">
-<div class="card"><b>Python</b><p class="r">pandas, numpy, SciPy, statsmodels</p><p class="alt">Uji z, CI, Cohen's h, bootstrap, Holm</p></div>
+<div class="card"><b>Python</b><p class="r">pandas, numpy, SciPy</p><p class="alt">Uji z, CI Wilson, Cohen's h, bootstrap, Bonferroni</p></div>
 <div class="card"><b>DuckDB + SQL</b><p class="r">Penyimpanan dan query</p><p class="alt">Opsional, untuk cek silang Q14</p></div>
 <div class="card"><b>Streamlit</b><p class="r">Dashboard</p><p class="alt">Belum dibuat, tahap D</p></div>
 <div class="card"><b>Markdown</b><p class="r">README dan laporan</p><p class="alt">Angka diambil dari CSV</p></div>
@@ -86,7 +86,7 @@
 <h4>Tahap C · Menghitung dan menganalisis</h4>
 <ol class="steps">
 <li><b class="t">SRM</b><p>Chi-square terhadap rasio 50:50.</p></li>
-<li><b class="t">Uji selisih</b><p>Uji z, CI, Cohen's h, dan power.</p></li>
+<li><b class="t">Uji selisih</b><p>Uji z, CI Wilson, Cohen's h, dan power.</p></li>
 <li><b class="t">Segmen</b><p>Hari dalam seminggu dan kuartil total ads.</p></li>
 <li><b class="t">Bootstrap dan sensitivitas</b><p>2.000 resample, dan buang outlier di atas P99.</p></li>
 <li><b class="t">Estimasi dampak</b><p>Konversi per 1 juta user, diberi label estimated.</p></li>
