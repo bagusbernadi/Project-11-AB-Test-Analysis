@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Project 11: A/B Test Analysis</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Analisis A/B test: iklan (ad) vs PSA pada 588 ribu user. Kualitas data, SRM, uji proporsi, segmen, dan rekomendasi.">
+<meta name="description" content="Analisis A/B test iklan vs PSA pada 588 ribu user: kualitas data, SRM, uji proporsi, segmen, dan rekomendasi.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap">
 <style>
@@ -192,23 +192,38 @@ main>nav{gap:8px}
 main>nav .links a{background:none;border:0;border-radius:8px;font-size:14.5px;font-weight:600;color:var(--mut);padding:6px 10px}
 main>nav .links a:hover,main>nav .links a:focus-visible{background:var(--soft);color:var(--head)}
 }
+.rt{font-size:14.5px}.rt td,.rt th{padding:7px 10px;vertical-align:top;overflow-wrap:normal}.rt td:not(:first-child){font-variant-numeric:tabular-nums}.rt td:first-child{white-space:nowrap}.rt code{font-size:.9em}
+.rc svg{min-width:0!important;max-width:100%}.figw.rc{overflow-x:auto}.figw.rc svg{min-width:640px!important}.figw.rc.sm svg{max-width:760px;margin:0 auto}
+.rc svg text{fill:#5F6368;font-size:12px}
+.lg{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;margin:4px 0 8px}.lg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.grid2>*{min-width:0}
+table.evq td:first-child{width:56px}
+.evq .en{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--soft);color:var(--head);font-weight:800;font-size:14px}
+.evq a{color:var(--ink);font-weight:700;font-size:16px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:2px 0;border-bottom:2px solid transparent}
+.evq a:hover,.evq a:focus-visible{color:var(--navy);border-bottom-color:var(--navy)}.evq tr:hover td{background:var(--soft)}
+.evq .pill{white-space:nowrap}.rt .pill{white-space:nowrap}
+.qa{display:grid;grid-template-columns:auto 1fr;gap:0 12px;padding:10px 14px;border-radius:12px;background:var(--sub);border-left:5px solid var(--teal);margin:10px 0}
+.qa.w{border-left-color:var(--amber)}.qa .qn{font-weight:800;font-size:15px;color:#fff;background:var(--teal);border-radius:8px;padding:2px 9px;height:fit-content;margin-top:2px}
+.qa.w .qn{background:var(--amberH)}.qa .qt{font-weight:700;line-height:1.4}.qa .qm{font-size:13px;color:var(--mut);margin:2px 0}.qa p{margin:4px 0 2px}
+.qlist{font-size:13px;font-weight:700;color:var(--mut);margin-left:6px;letter-spacing:.02em}
+.report-note{font-size:14px;color:var(--mut)}
+.qchips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.qc{display:inline-block;min-width:44px;text-align:center;font-weight:800;font-size:14px;padding:4px 10px;border-radius:10px;background:var(--teal);color:#fff!important;text-decoration:none}.qc.w{background:var(--amberH)}a.qc:hover{filter:brightness(1.12)}
+@media (min-width:1280px){
+main{grid-template-columns:250px minmax(0,1fr)}
+main>nav{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+main>nav .tab{padding:10px 8px;font-size:15px;text-align:center;border:2px solid var(--line);border-top:6px solid var(--c)}
+main>nav .tab.on{border-color:var(--c);background:var(--c);color:#fff}
+main>nav .links{grid-column:1/-1;margin:8px 0 0 4px}
+}
 
-.nav-note{font-size:var(--small);color:var(--mut)}
-.badge-no{background:var(--roseH);color:#fff;border-radius:999px;padding:1px 9px;font-size:var(--label);font-weight:700}
-.badge-ok{background:var(--teal);color:#fff;border-radius:999px;padding:1px 9px;font-size:var(--label);font-weight:700}
-.badge-ns{background:var(--sub);border:1px solid var(--line);color:var(--mut);border-radius:999px;padding:1px 9px;font-size:var(--label);font-weight:700}
-.pane[hidden]{display:none!important}
-.links a{margin-right:6px}
 </style>
+
+</head>
 <body>
 <a href="https://bagusbernadi.github.io/" style="display:inline-block;margin:12px 16px;font:600 14px/1.4 'Source Sans 3',Arial,sans-serif;color:#1A73E8;text-decoration:none">← All projects / Semua project</a>
 <main>
-<nav aria-label="Project navigation"><button type="button" class="tab on" data-t="design" aria-expanded="true" aria-controls="design">Design Project</button><div class="links" data-tab="design"><a href="#s1">Background</a><a href="#s2">Business Questions</a><a href="#s3">Significance &amp; Decision</a><a href="#s4">Dataset</a><a href="#s5">Tools</a><a href="#s6">Work Plan</a><a href="#s7">Project Outputs</a><a href="#s8">Success Criteria</a><a href="#s9">Assumptions &amp; Limitations</a></div><button type="button" class="tab" data-t="report" aria-expanded="false" aria-controls="report">Report Project</button><div class="links" data-tab="report" hidden><a href="#rp1">Problem</a><a href="#rp2">Data</a><a href="#rp3">Analysis</a><a href="#rp4">Recommendation</a><a href="#rp5">Impact</a><a href="#rp6">Batasan</a></div></nav>
-
-<header class="banner"><h1>Project 11: A/B Test Analysis</h1>
-<p class="goal"><b>Tujuan project:</b> menguji apakah iklan (ad) menghasilkan conversion rate lebih tinggi daripada PSA (layanan masyarakat), dan apakah selisihnya cukup besar dan stabil untuk dijadikan dasar keputusan kampanye.</p>
-<div class="tags"><span class="tlab">Kategori:</span><span class="tag a">Rancangan project v2</span><span class="tag c1">Marketing</span><span class="tag c2">Dataset publik</span><span class="tag c3">Statistik</span></div></header>
-
+<nav aria-label="Project navigation"><button type="button" class="tab on" data-t="design" aria-expanded="true" aria-controls="design">Design Project</button><div class="links" data-tab="design"><a href="#s1">Background</a><a href="#s2">Business Questions</a><a href="#s3">Significance &amp; Decision</a><a href="#s4">Dataset</a><a href="#s5">Tools</a><a href="#s6">Work Plan</a><a href="#s7">Project Outputs</a><a href="#s8">Success Criteria</a><a href="#s9">Assumptions &amp; Limitations</a></div><button type="button" class="tab" data-t="report" aria-expanded="false" aria-controls="report">Report Project</button><div class="links" data-tab="report" hidden><a href="#rp1">Data</a><a href="#rp2">Business Questions</a><a href="#rp3">Dataset</a><a href="#rp4">Tools</a><a href="#rp5">Alur Kerja</a><a href="#rp6">Project Output</a><a href="#rp7">Kesimpulan</a></div></nav>
+<header class="banner"><h1>Project 11: A/B Test Analysis</h1><p class="goal"><b>Tujuan project:</b> menguji apakah iklan (ad) menghasilkan conversion rate lebih tinggi daripada PSA, dan apakah selisihnya cukup besar dan stabil untuk keputusan kampanye.</p><div class="tags"><span class="tlab">Kategori:</span><span class="tag a">Rancangan v2 + Report v2</span><span class="tag c1">Marketing</span><span class="tag c2">Dataset publik</span><span class="tag c3">Statistik</span></div></header>
 <div class="pane" id="design" data-tab="design">
 <section class="card intro">
 <h3>Project Introduction</h3>
@@ -334,66 +349,31 @@ main>nav .links a:hover,main>nav .links a:focus-visible{background:var(--soft);c
 </div>
 
 <div class="pane" id="report" data-tab="report" hidden>
-<h2 id="rp1">1. Problem <small>Pertanyaan yang dijawab</small></h2>
-<div class="card"><p>Apakah menampilkan iklan menghasilkan conversion rate lebih tinggi daripada PSA, dan apakah selisihnya cukup besar dan stabil untuk keputusan kampanye?</p></div>
-<h2 id="rp2">2. Data <small>Sumber dan kualitas</small></h2>
-<div class="card">
-<p><b>Sumber:</b> <code>marketing_AB.csv</code> (Kaggle, faviovaz/marketing-ab-testing). Lisensi belum diverifikasi.</p>
-<p><b>Baris:</b> 588.101. Grup valid semua, tidak ada user ganda, tidak ada nilai hilang. Tidak ada baris yang dibuang (lihat <code>outputs/cleaning_log.csv</code>).</p>
-<p><b>Grup:</b> ad 564.577 user (96,0%), psa 23.524 user (4,0%).</p>
-<p><span class="badge-no">SRM gagal</span> chi-square = 497,769, p &lt; 0,0001. Pembagian grup tidak 50:50 dan mekanisme alokasinya tidak diketahui.</p>
+<div class="callout a"><b>Report Project versi 2: evaluasi hasil terhadap Design Project.</b> Data pada project ini adalah dataset publik, bukan simulasi.</div><h2 id="rp1">1. Data yang berhasil didapatkan<small>Isi data mentah, tabel di database, dan data hasil analisis</small></h2><div class="card"><p><b>Sumber:</b> Kaggle, "Marketing A/B Testing" (faviovaz/marketing-ab-testing), file <code>marketing_AB.csv</code>. Lisensi dan sitasi belum diverifikasi. Data mentah tidak di-commit.</p><p><b>Baris:</b> 588.101 baris mentah, 0 dibuang, 588.101 dipakai. Log per langkah ada di <code>outputs/cleaning_log.csv</code>.</p><p><b>Grup:</b> ad 564.577 user, psa 23.524 user.</p><p><b>Hasil yang dihasilkan:</b> <code>group_summary.csv</code>, <code>segment_day.csv</code>, <code>segment_ads_quartile.csv</code>, <code>test_results.csv</code>, dan log jalan.</p></div><h2 id="rp2">2. Apakah business question terjawab?<small>14 pertanyaan pada Design Project, dijawab dengan data</small></h2><div class="callout a"><b>14 pertanyaan dijawab</b>; kuning = terjawab dengan catatan atau belum dijawab.</div><div class="qchips"><a class="qc" href="#rp2">Q1</a><a class="qc w" href="#rp2">Q2</a><a class="qc w" href="#rp2">Q3</a><a class="qc" href="#rp2">Q4</a><a class="qc" href="#rp2">Q5</a><a class="qc" href="#rp2">Q6</a><a class="qc" href="#rp2">Q7</a><a class="qc w" href="#rp2">Q8</a><a class="qc w" href="#rp2">Q9</a><a class="qc w" href="#rp2">Q10</a><a class="qc" href="#rp2">Q11</a><a class="qc" href="#rp2">Q12</a><a class="qc w" href="#rp2">Q13</a><a class="qc w" href="#rp2">Q14</a></div><div class="qa"><span class="qn">Q1</span><div><div class="qt">Apakah data bersih (grup valid, tanpa user ganda)?</div><div class="qm">Utama · <span class="pill">Terjawab</span></div><p>Ya. 0 baris dibuang; semua grup valid dan tidak ada user ganda.</p></div></div><div class="qa w"><span class="qn">Q2</span><div><div class="qt">Apakah pembagian grup seimbang 50:50 (SRM)?</div><div class="qm">Utama · <span class="pill p">Dengan catatan</span></div><p>Tidak. Chi-square = 497.769, p < 0,0001. Ad 96,0%, psa 4,0%.</p></div></div><div class="qa w"><span class="qn">Q3</span><div><div class="qt">Bagaimana komposisi grup per hari dalam seminggu?</div><div class="qm">Utama · <span class="pill p">Dengan catatan</span></div><p>Dijawab dengan hari dalam seminggu, bukan tanggal. Dataset tidak punya tanggal, jadi tren waktu tidak bisa diukur.</p></div></div><div class="qa"><span class="qn">Q4</span><div><div class="qt">Berapa conversion rate ad dan psa, dan berapa selisihnya?</div><div class="qm">Utama · <span class="pill">Terjawab</span></div><p>CR ad 2,55%, CR psa 1,79%. Selisih 0,77 poin, lift relatif 43%.</p></div></div><div class="qa"><span class="qn">Q5</span><div><div class="qt">Apakah selisih signifikan (uji z dua proporsi)?</div><div class="qm">Utama · <span class="pill">Terjawab</span></div><p>Ya. z = 7,37, p < 0,0001.</p></div></div><div class="qa"><span class="qn">Q6</span><div><div class="qt">Berapa confidence interval selisih?</div><div class="qm">Utama · <span class="pill">Terjawab</span></div><p>95%: 0,60 s.d. 0,94 poin. Bootstrap 2.000 resample: 0,59 s.d. 0,94 poin.</p></div></div><div class="qa"><span class="qn">Q7</span><div><div class="qt">Berapa Cohen&#x27;s h dan power untuk MDE 0,5 poin?</div><div class="qm">Utama · <span class="pill">Terjawab</span></div><p>Cohen's h = 0,053 (kecil). Daya untuk MDE 0,5 poin mendekati 100% pada ukuran sampel ini.</p></div></div><div class="qa w"><span class="qn">Q8</span><div><div class="qt">Apakah selisih sama di tiap hari dalam seminggu?</div><div class="qm">Utama · <span class="pill p">Dengan catatan</span></div><p>Tidak merata. Selasa, Senin, Rabu, Jumat, dan Sabtu signifikan setelah koreksi Holm; Kamis dan Minggu tidak.</p></div></div><div class="qa w"><span class="qn">Q9</span><div><div class="qt">Apakah selisih bergantung pada intensitas iklan (kuartil total ads)?</div><div class="qm">Utama · <span class="pill p">Dengan catatan</span></div><p>Ya. Hanya kuartil teratas yang berbeda (selisih 3,01 poin, p < 0,0001). Tiga kuartil lainnya tidak.</p></div></div><div class="qa w"><span class="qn">Q10</span><div><div class="qt">Berapa tambahan konversi per 1 juta user (estimasi, dengan rentang)?</div><div class="qm">Utama · <span class="pill p">Dengan catatan</span></div><p>Estimasi 7.692 konversi per 1 juta user (CI 5.951 s.d. 9.434). Per bulan tidak bisa dihitung tanpa data trafik.</p></div></div><div class="qa"><span class="qn">Q11</span><div><div class="qt">Berapa ukuran sampel per grup untuk MDE 0,5 poin?</div><div class="qm">Utama · <span class="pill">Terjawab</span></div><p>6.237 user per grup (power 80%, alpha 0,05). Dataset jauh di atas angka ini.</p></div></div><div class="qa"><span class="qn">Q12</span><div><div class="qt">Apakah hasil stabil menurut bootstrap?</div><div class="qm">Utama · <span class="pill">Terjawab</span></div><p>Ya. CI bootstrap hampir sama dengan CI analitik.</p></div></div><div class="qa w"><span class="qn">Q13</span><div><div class="qt">Apakah baris outlier (total ads di atas P99) mengubah kesimpulan?</div><div class="qm">Utama · <span class="pill p">Dengan catatan</span></div><p>Tidak. Dengan buang user total ads di atas P99, selisih 0,79 poin, p < 0,0001.</p></div></div><div class="qa w"><span class="qn">Q14</span><div><div class="qt">Apakah hasil SQL (DuckDB) sama dengan Python?</div><div class="qm">Utama · <span class="pill p">Dengan catatan</span></div><p>Belum dijawab. DuckDB dan query SQL belum dibuat.</p></div></div><h2 id="rp3">3. Apakah dataset sesuai dengan Design Project?<small>Perbandingan rancangan dengan realisasi</small></h2><div class="scroll"><table class="rt"><tr><th>Aspek</th><th>Rancangan</th><th>Realisasi</th></tr><tr><td>Jumlah baris</td><td>±294 ribu</td><td>588.101 (dataset lebih besar)</td></tr><tr><td>Grup</td><td>Halaman baru vs lama, 50:50</td><td>Iklan vs PSA, 96,0% vs 4,0%</td></tr><tr><td>Kolom</td><td>5 kolom + file negara</td><td>6 kolom, tanpa negara dan tanggal</td></tr><tr><td>Kualitas</td><td>Ada baris bermasalah</td><td>0 baris dibuang; data bersih</td></tr><tr><td>Lisensi</td><td>Belum diverifikasi</td><td>Belum diverifikasi</td></tr></table></div><h2 id="rp4">4. Apakah tools yang digunakan sesuai?<small>Perbandingan rancangan dengan eksekusi</small></h2><div class="scroll"><table class="rt"><tr><th>Tool</th><th>Rancangan</th><th>Dipakai</th></tr><tr><td>Python (pandas, SciPy, statsmodels)</td><td>Ya</td><td>Ya</td></tr><tr><td>DuckDB + SQL</td><td>Ya</td><td>Belum</td></tr><tr><td>Streamlit (dashboard)</td><td>Ya</td><td>Belum</td></tr><tr><td>Markdown (README)</td><td>Ya</td><td>Ya, angka dari CSV</td></tr></table></div><p class="report-note">DuckDB dan Streamlit belum dipakai. Perlu ditambahkan agar sesuai rancangan.</p><h2 id="rp5">5. Apakah alur pengerjaan sesuai dengan Design Project?<small>12 langkah rancangan vs yang dijalankan</small></h2><div class="scroll"><table class="rt"><tr><th>No</th><th>Langkah rancangan</th><th>Status</th></tr><tr><td>1</td><td>Tulis rancangan dan aturan uji</td><td><span class="pill">Sesuai</span></td></tr><tr><td>2</td><td>Tulis kamus data</td><td><span class="pill p">Sebagian</span></td></tr><tr><td>3</td><td>Cek kualitas data</td><td><span class="pill">Sesuai</span></td></tr><tr><td>4</td><td>Cleaning dengan log</td><td><span class="pill">Sesuai</span></td></tr><tr><td>5</td><td>Muat ke DuckDB</td><td><span class="pill d">Belum</span></td></tr><tr><td>6</td><td>SRM</td><td><span class="pill">Sesuai</span></td></tr><tr><td>7</td><td>Uji selisih</td><td><span class="pill">Sesuai</span></td></tr><tr><td>8</td><td>Segmen hari dan intensitas</td><td><span class="pill">Sesuai</span></td></tr><tr><td>9</td><td>Bootstrap dan sensitivitas</td><td><span class="pill">Sesuai</span></td></tr><tr><td>10</td><td>Estimasi dampak</td><td><span class="pill">Sesuai</span></td></tr><tr><td>11</td><td>Cek silang SQL vs Python</td><td><span class="pill d">Belum</span></td></tr><tr><td>12</td><td>Dashboard, one-sheet, README</td><td><span class="pill p">Sebagian</span></td></tr></table></div><p class="report-note">Dari 12 langkah rancangan: 8 selesai, 2 sebagian, 2 belum.</p><h2 id="rp6">6. Apakah project output tercapai?<small>Output pada Design Project, bagian 7</small></h2><div class="scroll"><table class="rt"><tr><th>Output</th><th>Status</th></tr><tr><td>Dashboard Streamlit</td><td><span class="pill d">Belum</span></td></tr><tr><td>One-sheet PDF/PNG</td><td><span class="pill d">Belum</span></td></tr><tr><td>Database DuckDB dan folder SQL</td><td><span class="pill d">Belum</span></td></tr><tr><td>Modul Python uji A/B</td><td><span class="pill p">Sebagian</span></td></tr><tr><td>Notebook analisis</td><td><span class="pill d">Belum</span></td></tr><tr><td>README</td><td><span class="pill">Sesuai</span></td></tr><tr><td>Repositori GitHub</td><td><span class="pill">Sesuai</span></td></tr><tr><td>Slide (opsional)</td><td><span class="pill d">Belum</span></td></tr></table></div><p class="report-note">Output yang belum ada harus dibuat sebelum project dianggap selesai.</p><h2 id="rp7">7. Kesimpulan<small>Hasil analisis, Impact, success criteria, rekomendasi, saran perbaikan, dan batasan</small></h2><h4>7.1 Hasil analisis</h4><div class="card"><p>Iklan menghasilkan conversion rate lebih tinggi dibanding PSA: 2,55% vs 1,79%, selisih 0,77 poin (CI 95% 0,60 s.d. 0,94, p < 0,0001).</p><p>Namun pembagian grup gagal SRM, dan efeknya hanya terlihat pada kuartil total ads teratas.</p></div><h4>7.2 Impact</h4><div class="card"><p><b>Estimated:</b> sekitar 7.692 konversi tambahan per 1 juta user yang melihat iklan dibanding PSA. Estimasi per bulan belum bisa dihitung karena dataset tidak punya trafik per bulan.</p></div><h4>7.3 Success criteria</h4><div class="card"><ul><li>Q1–Q13 terjawab dengan angka dari data: tercapai.</li><li>Aturan uji tertulis sebelum hasil dilihat: tercapai.</li><li>SRM dilaporkan jujur: tercapai.</li><li>Dashboard bisa dibuka dan keputusan dijelaskan dalam 1 menit: belum.</li></ul></div><h4>7.4 Rekomendasi</h4><div class="card"><p><b>Jangan rollout dari angka ini saja.</b> Pastikan mekanisme alokasi grup dengan pemilik data, lalu jalankan ulang test dengan alokasi acak 50:50 dan catat sumber serta tanggalnya.</p></div><h4>7.5 Saran perbaikan</h4><div class="card"><ul><li>Buat DuckDB dan query SQL, lalu cek silang Q14.</li><li>Buat dashboard Streamlit dan one-sheet.</li><li>Ubah angka README agar diambil dari CSV.</li><li>Tambahkan kolom tanggal dan negara jika ada, agar Q3 dan Q8 bisa dijawab penuh.</li></ul></div><h4>7.6 Batasan</h4><div class="card"><ul><li><b>SRM gagal:</b> 96,0% vs 4,0%. Batasan utama.</li><li><b>Tanpa tanggal dan negara:</b> efek kebaruan dan tren waktu tidak bisa diuji.</li><li><b>Total ads mungkin dipengaruhi perlakuan:</b> dipakai untuk deskripsi, bukan kontrol kausal.</li><li><b>Tanpa nilai pembelian:</b> dampak revenue tidak dihitung.</li><li><b>Lisensi belum diverifikasi.</b></li></ul></div>
 </div>
-<h2 id="rp3">3. Analysis <small>Hasil uji</small></h2>
-<h3>Hasil utama</h3>
-<div class="kpis">
-<div class="card kpi"><span class="v">2,55%</span><span class="l">Conversion rate ad</span><span class="d">564,577 user</span></div>
-<div class="card kpi"><span class="v">1,79%</span><span class="l">Conversion rate psa</span><span class="d">23,524 user</span></div>
-<div class="card kpi t"><span class="v">+0,77</span><span class="l">Selisih (poin)</span><span class="d">CI 95%: 0,60 s.d. 0,94 poin</span></div>
-</div>
-<div class="card"><p>Selisih 0,77 poin, lift relatif 43%, z = 7.37, p &lt; 0,0001. Bootstrap (2.000 resample) memberi CI 0,59 s.d. 0,94 poin. Cohen's h = 0.053 (kecil).</p></div>
-<h3>Segmen hari dalam seminggu (Q3, Q8)</h3>
-<div class="scroll"><table><tr><th>Hari</th><th>CR ad</th><th>CR psa</th><th>Selisih (poin)</th><th>p (Holm)</th><th>Hasil</th></tr>
-<tr><td>Monday</td><td>3,32%</td><td>2,26%</td><td>1,07</td><td>0,0025</td><td><span class="badge-ok">signifikan</span></td></tr><tr><td>Tuesday</td><td>3,04%</td><td>1,44%</td><td>1,60</td><td>&lt; 0,0001</td><td><span class="badge-ok">signifikan</span></td></tr><tr><td>Wednesday</td><td>2,54%</td><td>1,58%</td><td>0,96</td><td>0,0023</td><td><span class="badge-ok">signifikan</span></td></tr><tr><td>Thursday</td><td>2,16%</td><td>2,02%</td><td>0,14</td><td>0,5548</td><td><span class="badge-ns">tidak signifikan</span></td></tr><tr><td>Friday</td><td>2,25%</td><td>1,63%</td><td>0,62</td><td>0,0347</td><td><span class="badge-ok">signifikan</span></td></tr><tr><td>Saturday</td><td>2,13%</td><td>1,40%</td><td>0,73</td><td>0,0299</td><td><span class="badge-ok">signifikan</span></td></tr><tr><td>Sunday</td><td>2,46%</td><td>2,06%</td><td>0,40</td><td>0,3144</td><td><span class="badge-ns">tidak signifikan</span></td></tr>
-</table></div>
-<div class="how">Koreksi Holm dipakai untuk 7 uji. Selisih terbesar di Selasa, Senin, dan Rabu. Kamis dan Minggu tidak signifikan.</div>
-<h3>Intensitas iklan (Q9)</h3>
-<div class="scroll"><table><tr><th>Kuartil total ads</th><th>CR ad</th><th>CR psa</th><th>Selisih (poin)</th><th>p</th><th>Hasil</th></tr>
-<tr><td>Q1</td><td>0,24%</td><td>0,20%</td><td>0,04</td><td>0,5688</td><td><span class="badge-ns">tidak signifikan</span></td></tr><tr><td>Q2</td><td>0,51%</td><td>0,60%</td><td>-0,09</td><td>0,3218</td><td><span class="badge-ns">tidak signifikan</span></td></tr><tr><td>Q3</td><td>1,15%</td><td>1,26%</td><td>-0,11</td><td>0,4518</td><td><span class="badge-ns">tidak signifikan</span></td></tr><tr><td>Q4</td><td>8,31%</td><td>5,30%</td><td>3,01</td><td>&lt; 0,0001</td><td><span class="badge-ok">signifikan</span></td></tr>
-</table></div>
-<div class="callout a"><h4>Temuan penting</h4><p>Selisih hanya muncul di kuartil teratas total ads (CR 8,31% vs 5,30%). Tiga kuartil lainnya tidak berbeda. Efek keseluruhan terutama berasal dari user yang paling sering melihat iklan.</p></div>
-<h3>Sensitivitas (Q13)</h3>
-<div class="card"><p>Buang user dengan total ads di atas P99 (202): selisih 0,79 poin, CI 0,62 s.d. 0,96, p &lt; 0,0001. Kesimpulan tidak berubah.</p></div>
-<h3>Ukuran sampel dan daya (Q7, Q11)</h3>
-<div class="card"><p>Untuk mendeteksi MDE 0,5 poin dari baseline 1,8% dengan power 80% dan alpha 0,05 dibutuhkan <b>6,237 user per grup</b>. Dataset ini jauh di atas angka itu.</p></div>
-<h2 id="rp4">4. Recommendation <small>Tindakan yang disarankan</small></h2>
-<div class="card">
-<p><b>Keputusan:</b> jangan rollout berdasarkan angka ini saja. Iklan tampak lebih baik secara keseluruhan, tetapi ada dua masalah: pembagian grup gagal SRM, dan efek terutama terlihat pada user dengan intensitas iklan tertinggi.</p>
-<p><b>Langkah berikutnya:</b> (1) pastikan mekanisme alokasi grup dengan pemilik data. (2) Jalankan ulang test dengan alokasi acak 50:50 dan catat tanggal serta sumber. (3) Uji apakah efeknya nyata pada intensitas menengah.</p>
-</div>
-<h2 id="rp5">5. Impact <small>Estimasi, bukan hasil pasti</small></h2>
-<div class="card">
-<p><b>Estimated:</b> tambahan konversi per 1 juta user yang melihat iklan dibanding PSA ≈ <b>7,692</b> (CI 95%: 5,951 s.d. 9,434).</p>
-<p>Estimasi per bulan membutuhkan jumlah user per bulan, yang tidak ada di dataset. Angka ini hanya bisa dihitung setelah asumsi trafik ditetapkan. Revenue tidak dihitung karena dataset tidak punya nilai pesanan.</p>
-</div>
-<h2 id="rp6">6. Batasan <small>Hal yang perlu diwaspadai</small></h2>
-<div class="card"><ul>
-<li><b>SRM gagal:</b> pembagian grup 96% vs 4%. Efek bisa dipengaruhi cara grup dibentuk. Ini batasan utama.</li>
-<li><b>Tanpa tanggal dan negara:</b> efek kebaruan, tren waktu, dan segmen negara tidak bisa diuji.</li>
-<li><b>Total ads mungkin dipengaruhi perlakuan:</b> segmen kuartil dipakai untuk deskripsi, bukan kontrol kausal.</li>
-<li><b>Tanpa nilai pembelian:</b> dampak revenue tidak dihitung.</li>
-<li><b>Signifikan tidak sama dengan penting:</b> dengan sampel besar selisih kecil pun signifikan. Besar efek (h = 0,053) kecil.</li>
-<li><b>Lisensi dan sitasi</b> dataset belum diverifikasi.</li>
-</ul></div>
-</div>
-<script>
-document.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){
-var t=b.dataset.t;document.querySelectorAll('.tab').forEach(function(x){var on=x.dataset.t===t;x.classList.toggle('on',on);x.setAttribute('aria-expanded',on)});
-document.querySelectorAll('.links').forEach(function(l){l.hidden=l.dataset.tab!==t});
-document.getElementById(t).hidden=false;document.querySelectorAll('.pane').forEach(function(p){if(p.id!==t)p.hidden=true});
-window.scrollTo(0,0);});});
-function openFromHash(){var h=location.hash.slice(1);if(/^rp/.test(h)){document.querySelector('.tab[data-t="report"]').click()}}
-window.addEventListener('hashchange',openFromHash);openFromHash();
-</script>
+
 </main>
-</body>
-</html>
+<script>
+const G=[["conversion rate","i","Persentase user yang melakukan konversi.\nRumus: CR = user konversi ÷ semua user di grup.\nContoh: 1.200 dari 10.000 user, CR = 12%."],["selisih","i","Beda conversion rate dua grup dalam poin persentase.\nRumus: selisih = CR ad − CR psa."],["lift relatif","i","Kenaikan CR dibanding basis, dalam persen.\nRumus: (CR ad − CR psa) ÷ CR psa."],["p-value","","Peluang melihat selisih sebesar ini jika sebenarnya kedua grup sama. Batas umum: 0,05."],["confidence interval","i","Rentang tempat selisih sebenarnya kemungkinan berada (95%)."],["SRM","","Sample Ratio Mismatch: pembagian grup tidak sesuai rasio yang direncanakan. Tanda ada masalah pada cara grup dibentuk."],["Cohen's h","","Ukuran besar selisih dua proporsi. Sekitar 0,2 kecil, 0,5 sedang, 0,8 besar."],["power","i","Peluang uji mendeteksi selisih yang nyata. Target umum 80%."],["MDE","i","Minimum detectable effect: selisih terkecil yang bisa dideteksi dengan power yang ditetapkan."],["bootstrap","","Cara menghitung ketidakpastian dengan mengulang sampel acak berkali-kali."],["Holm","","Koreksi p-value saat banyak uji dilakukan sekaligus, agar kesalahan tipe I tetap terkendali."],["P99","i","Nilai di bawah 99% data. Dipakai untuk menandai nilai ekstrem."],["kuartil","i","Pembagian data menjadi empat bagian sama besar berdasarkan urutan nilai."],["estimated","i","Angka hasil perhitungan dari asumsi, bukan hasil pengukuran langsung."]];
+const TERMS=G.map(([t,f,d])=>({t,d,re:new RegExp('(?<![\\w-])'+t.replace(/[.*+?^${}()|[\]\\-]/g,'\\$&')+'(?![\\w-])',f)}));
+const SK='svg,.fx,.fbar,.oh,h1,h2,h3,nav,button,script,style,summary,.tm,.tag,.pri,.pill,.v,.l,.chip,.flow,th,#tip,.banner,.theme,.phase,.add,.tools b,b.t,table td:first-child,.wb,code';
+function wrapT(n,seen){let b=null;for(const x of TERMS){if(seen.has(x.t))continue;const m=x.re.exec(n.data);if(m&&(!b||m.index<b.i||(m.index==b.i&&m[0].length>b.l)))b={x,i:m.index,l:m[0].length}}
+if(!b)return;seen.add(b.x.t);const r=n.splitText(b.i),a=r.splitText(b.l),s=document.createElement('span');s.className='tm';s.tabIndex=0;s.dataset.d=b.x.d;s.textContent=r.data;r.replaceWith(s);wrapT(a,seen)}
+function hl(root,seen){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest(SK)?3:1}),ns=[];while(w.nextNode())ns.push(w.currentNode);ns.forEach(n=>wrapT(n,seen))}
+const tip=document.createElement('div');tip.id='tip';tip.setAttribute('role','tooltip');document.body.appendChild(tip);
+function showT(e){tip.textContent=e.dataset.d;tip.style.display='block';const r=e.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=Math.max(8,Math.min(innerWidth-w-8,r.left))+'px';tip.style.top=(r.bottom+h+12>innerHeight?r.top-h-6:r.bottom+6)+'px'}
+document.addEventListener('click',ev=>{const t=ev.target.closest('.tm');t?showT(t):tip.style.display='none'});
+document.addEventListener('mouseover',ev=>{const t=ev.target.closest('.tm');if(t)showT(t)});
+document.addEventListener('mouseout',ev=>{if(ev.target.closest&&ev.target.closest('.tm'))tip.style.display='none'});
+document.addEventListener('focusin',ev=>{const t=ev.target.closest&&ev.target.closest('.tm');if(t)showT(t)});
+addEventListener('scroll',()=>tip.style.display='none',{passive:true});
+let seen=new Set();document.querySelectorAll('main>.pane>*').forEach(el=>{if(el.tagName=='H2')seen=new Set();hl(el,seen)});
+const TB=[...document.querySelectorAll('.tab')];
+function setTab(t){document.querySelectorAll('.pane,.links').forEach(e=>e.hidden=e.dataset.tab!==t);TB.forEach(x=>{const on=x.dataset.t===t;x.classList.toggle('on',on);x.setAttribute('aria-expanded',on)})}
+function route(){const h=decodeURIComponent(location.hash.slice(1)),el=h&&document.getElementById(h);
+if(h=='design'||h=='report'){setTab(h);scrollTo(0,0);return}
+if(el){const p=el.closest('.pane');if(p){setTab(p.dataset.tab);el.scrollIntoView()}}}
+TB.forEach(x=>x.onclick=()=>{location.hash=x.dataset.t});
+addEventListener('hashchange',route);route();
+</script>
+</body></html>

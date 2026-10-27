@@ -1,0 +1,124 @@
+<div class="pane" id="design" data-tab="design">
+<section class="card intro">
+<h3>Project Introduction</h3>
+<p>Bayangkan sebuah toko online yang ingin tahu apakah iklan benar-benar membuat pengunjung membeli, atau pengunjung akan membeli juga tanpa iklan. Sebagian user melihat iklan, sebagian lain melihat PSA. Setelah itu kita hitung berapa persen user di tiap grup yang akhirnya melakukan konversi.</p>
+<p>Misalnya grup iklan mencapai 2,6% konversi dan grup PSA 1,8%. Apakah selisih itu nyata, atau kebetulan? Jika nyata, berapa besar tambahan konversinya, dan apakah cukup untuk diputuskan sebagai kebijakan?</p>
+<div class="scroll"><table><tr><th>Di toko fisik</th><th>Di project ini</th></tr>
+<tr><td>Promo yang dipasang</td><td>Grup <b>ad</b> (iklan) dan grup <b>psa</b> (layanan masyarakat)</td></tr>
+<tr><td>Pengunjung yang membeli</td><td>Konversi: <code>converted = True</code></td></tr>
+<tr><td>Selisih karena hari itu kebetulan ramai</td><td>Variasi acak, diukur dengan p-value dan confidence interval</td></tr>
+<tr><td>Pengunjung yang melihat promo berkali-kali</td><td>Intensitas iklan (<code>total ads</code>), dipakai untuk segmentasi</td></tr></table></div>
+</section>
+
+<h2 id="s1">1. Background <small>Latar belakang masalah</small></h2>
+<div class="card">
+<h3>Latar belakang masalah</h3>
+<p>Tim marketing perlu tahu apakah iklan layak dipakai sebagai pengganti PSA di halaman yang sama. Keputusan ini mahal jika salah: iklan menghasilkan pendapatan tapi juga biaya tayang, sedangkan PSA punya fungsi lain. Karena itu keputusan harus didasarkan pada bukti yang bisa diverifikasi.</p>
+<h3>Alasan memilih tema ini sebagai portofolio</h3>
+<p>Dataset ini memperlihatkan langkah lengkap A/B test: pembagian grup, cek kualitas, uji proporsi, segmentasi, dan keputusan. Dataset ini juga punya masalah nyata yang harus dijelaskan, yaitu pembagian grup yang sangat tidak seimbang.</p>
+</div>
+
+<h2 id="s2">2. Business Questions <small>Pertanyaan yang akan dijawab</small></h2>
+<h4>Pertanyaan utama</h4>
+<div class="card"><p>Apakah menampilkan iklan menghasilkan conversion rate lebih tinggi daripada PSA, dan apakah selisihnya cukup besar untuk dijadikan dasar keputusan?</p></div>
+<h4>Daftar pertanyaan (14)</h4>
+<div class="q"><span class="id">Q1</span><span>Apakah data bersih (grup valid, tanpa user ganda)?</span><span class="m">Cleaning dan log</span></div>
+<div class="q"><span class="id">Q2</span><span>Apakah pembagian grup seimbang 50:50 (SRM)?</span><span class="m">Chi-square</span></div>
+<div class="q"><span class="id">Q3</span><span>Bagaimana komposisi grup per hari dalam seminggu?</span><span class="m">Diganti dari komposisi negara (dataset tidak punya negara)</span></div>
+<div class="q"><span class="id">Q4</span><span>Berapa conversion rate ad dan psa, dan berapa selisihnya?</span><span class="m">Hasil utama</span></div>
+<div class="q"><span class="id">Q5</span><span>Apakah selisih signifikan (uji z dua proporsi)?</span><span class="m">p-value</span></div>
+<div class="q"><span class="id">Q6</span><span>Berapa confidence interval selisih?</span><span class="m">95%</span></div>
+<div class="q"><span class="id">Q7</span><span>Berapa Cohen's h dan power untuk MDE 0,5 poin?</span><span class="m">Besar efek dan daya</span></div>
+<div class="q"><span class="id">Q8</span><span>Apakah selisih sama di tiap hari dalam seminggu?</span><span class="m">Diganti dari negara US/UK/CA</span></div>
+<div class="q"><span class="id">Q9</span><span>Apakah selisih bergantung pada intensitas iklan (kuartil total ads)?</span><span class="m">Diganti dari efek kebaruan (tanpa tanggal)</span></div>
+<div class="q"><span class="id">Q10</span><span>Berapa tambahan konversi per 1 juta user (estimasi, dengan rentang)?</span><span class="m">Diberi label estimated</span></div>
+<div class="q"><span class="id">Q11</span><span>Berapa ukuran sampel per grup untuk MDE 0,5 poin?</span><span class="m">Power 80%, alpha 0,05</span></div>
+<div class="q"><span class="id">Q12</span><span>Apakah hasil stabil menurut bootstrap?</span><span class="m">2.000 resample</span></div>
+<div class="q"><span class="id">Q13</span><span>Apakah baris outlier (total ads di atas P99) mengubah kesimpulan?</span><span class="m">Sensitivitas</span></div>
+<div class="q"><span class="id">Q14</span><span>Apakah hasil SQL (DuckDB) sama dengan Python?</span><span class="m">Cek silang, jika DuckDB dipakai</span></div>
+
+
+<h2 id="s3">3. Significance &amp; Decision <small>Alur keputusan rollout</small></h2>
+<div class="flow"><span>Cek kualitas data</span><i>→</i><span class="ng">SRM gagal?</span><i>→</i><span>Uji selisih</span><i>→</i><span>Besar efek dan stabilitas</span><i>→</i><span class="ok">Keputusan</span></div>
+<div class="card"><p>Rollout hanya disarankan jika selisih signifikan (p &lt; 0,05), confidence interval tidak melewati nol, dan efek stabil di segmen utama. Jika SRM gagal, kesimpulan kausal ditulis dengan batasan eksplisit.</p></div>
+<h4>Kenapa ukuran sampel menentukan kesimpulan</h4>
+<div class="card"><p>Dengan sampel sangat besar, selisih kecil pun bisa signifikan. Karena itu keputusan juga melihat besar efek dan confidence interval, bukan hanya p-value.</p></div>
+
+<h2 id="s4">4. Dataset <small>Sumber, ukuran, dan hipotesis</small></h2>
+<div class="card">
+<p><b>Sumber:</b> Kaggle, "Marketing A/B Testing" (faviovaz/marketing-ab-testing), file <code>marketing_AB.csv</code>. Lisensi dan sitasi belum diverifikasi.</p>
+<p><b>Ukuran:</b> 588.101 baris, satu baris per user. Tidak ada kolom tanggal dan negara.</p>
+<p><b>Kolom:</b> <code>user id</code>, <code>test group</code> (ad / psa), <code>converted</code>, <code>total ads</code>, <code>most ads day</code>, <code>most ads hour</code>.</p>
+</div>
+<h4>Hipotesis yang akan diuji (belum terbukti)</h4>
+<div class="card"><ol>
+<li>Iklan tidak meningkatkan conversion rate secara bermakna dibanding PSA.</li>
+<li>Pembagian grup seimbang 50:50. (Diuji dengan SRM.)</li>
+<li>Selisih conversion rate tidak berbeda antar hari dalam seminggu.</li>
+<li>Selisih conversion rate tidak bergantung pada intensitas iklan (kuartil total ads).</li>
+<li>Baris outlier (total ads di atas P99) tidak mengubah kesimpulan.</li></ol></div>
+<h3>Empat tabel yang akan dibuat</h3>
+<div class="scroll"><table><tr><th>Tabel</th><th>Isi</th></tr>
+<tr><td><code>users</code></td><td>Data bersih, satu baris per user</td></tr>
+<tr><td><code>group_summary</code></td><td>n, konversi, dan conversion rate per grup</td></tr>
+<tr><td><code>segment_day</code></td><td>Conversion rate per hari dalam seminggu, dengan koreksi Holm</td></tr>
+<tr><td><code>test_results</code></td><td>Semua uji statistik dan sensitivitas</td></tr></table></div>
+
+
+<h2 id="s5">5. Tools <small>Alat yang dipakai</small></h2>
+<div class="tools">
+<div class="card"><b>Python</b><p class="r">pandas, numpy, SciPy, statsmodels</p><p class="alt">Uji z, CI, Cohen's h, bootstrap, Holm</p></div>
+<div class="card"><b>DuckDB + SQL</b><p class="r">Penyimpanan dan query</p><p class="alt">Opsional, untuk cek silang Q14</p></div>
+<div class="card"><b>Streamlit</b><p class="r">Dashboard</p><p class="alt">Belum dibuat, tahap D</p></div>
+<div class="card"><b>Markdown</b><p class="r">README dan laporan</p><p class="alt">Angka diambil dari CSV</p></div>
+</div>
+
+<h2 id="s6">6. Work Plan <small>12 langkah</small></h2>
+<h4>Tahap A · Perencanaan</h4>
+<ol class="steps">
+<li><b class="t">Tulis rancangan dan aturan uji</b><p>Alpha 0,05 dua arah, power 80%, MDE 0,5 poin.</p></li>
+<li><b class="t">Tulis kamus data</b><p>Definisi setiap kolom.</p></li></ol>
+<h4>Tahap B · Menyiapkan data</h4>
+<ol class="steps">
+<li><b class="t">Cek kualitas data</b><p>Grup valid, duplikat, nilai hilang.</p></li>
+<li><b class="t">Cleaning dengan log</b><p>Setiap baris yang dibuang dicatat.</p></li>
+<li><b class="t">Muat ke DuckDB (opsional)</b><p>Tabel sesuai bagian 4.</p></li></ol>
+<h4>Tahap C · Menghitung dan menganalisis</h4>
+<ol class="steps">
+<li><b class="t">SRM</b><p>Chi-square terhadap rasio 50:50.</p></li>
+<li><b class="t">Uji selisih</b><p>Uji z, CI, Cohen's h, dan power.</p></li>
+<li><b class="t">Segmen</b><p>Hari dalam seminggu dan kuartil total ads.</p></li>
+<li><b class="t">Bootstrap dan sensitivitas</b><p>2.000 resample, dan buang outlier di atas P99.</p></li>
+<li><b class="t">Estimasi dampak</b><p>Konversi per 1 juta user, diberi label estimated.</p></li>
+<li><b class="t">Cek silang</b><p>SQL vs Python, jika DuckDB dipakai.</p></li></ol>
+<h4>Tahap D · Menyajikan</h4>
+<ol class="steps">
+<li><b class="t">Dashboard, one-sheet, dan README</b><p>Keputusan, batasan, dan cara menjalankan ulang.</p></li></ol>
+
+<h2 id="s7">7. Project Outputs <small>Hasil yang bisa dibuka dan dipakai ulang</small></h2>
+<div class="card"><ul>
+<li><b>Dashboard Streamlit</b> (utama): ringkasan, kualitas data (SRM), segmen, kalkulator sampel.</li>
+<li><b>One-sheet PDF/PNG</b> (utama): ringkasan satu halaman.</li>
+<li><b>Database DuckDB dan folder SQL</b> (utama, jika dipakai).</li>
+<li><b>Modul Python uji A/B</b> (utama): fungsi uji yang bisa dipakai ulang.</li>
+<li><b>Notebook analisis Q1–Q14</b> (utama).</li>
+<li><b>README</b> (utama): problem, data, analisis, rekomendasi, dampak, batasan.</li>
+<li><b>Repositori GitHub</b> (utama).</li>
+<li><b>Slide</b> (opsional).</li></ul></div>
+
+<h2 id="s8">8. Success Criteria <small>Kapan project dianggap selesai</small></h2>
+<div class="card"><ul>
+<li>Q1–Q13 terjawab dengan angka dari data.</li>
+<li>Aturan uji tertulis sebelum hasil dilihat dan tidak diubah.</li>
+<li>SRM dilaporkan jujur, termasuk kegagalannya.</li>
+<li>Pembaca awam bisa menyebut keputusan dan alasannya dalam 1 menit.</li></ul></div>
+
+<h2 id="s9">9. Assumptions &amp; Limitations <small>Keputusan dan hal yang perlu diwaspadai</small></h2>
+<div class="card"><ul>
+<li><b>Jenis data:</b> dataset publik, apa adanya. Temuan berlaku untuk dataset ini.</li>
+<li><b>Tanpa nilai pembelian:</b> dampak revenue hanya ilustrasi.</li>
+<li><b>Tanpa tanggal dan negara:</b> efek kebaruan dan tren waktu tidak bisa diuji.</li>
+<li><b>Total ads mungkin dipengaruhi perlakuan:</b> dipakai untuk deskripsi, bukan kontrol kausal.</li>
+<li><b>SRM gagal:</b> mekanisme alokasi grup tidak diketahui. Ini batasan utama.</li></ul></div>
+</div>
+
