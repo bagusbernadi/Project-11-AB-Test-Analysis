@@ -34,7 +34,7 @@ M("## Q8–Q9 · Segmen hari dan intensitas iklan\nSegmen hari memakai `most ads
 C("import numpy as np\nday = raw.assign(grp=raw['test group']).groupby(['most ads day', 'test group'])['converted'].agg(['count', 'sum']).unstack()\n"
   "rows = []\nfor d in day.index:\n    a = two_prop_test(int(day.loc[d, ('sum','ad')]), int(day.loc[d, ('count','ad')]), int(day.loc[d, ('sum','psa')]), int(day.loc[d, ('count','psa')]))\n"
   "    rows.append((d, round(a['diff']*100, 2), f\"{a['p_value']:.2e}\"))\n"
-  "pd.DataFrame(rows, columns=['hari', 'selisih (poin)', 'p (sebelum Holm)'])"),
+  "pd.DataFrame(rows, columns=['hari', 'selisih (poin)', 'p (sebelum Bonferroni)'])"),
 C("q = raw.assign(kuartil=pd.qcut(raw['total ads'].rank(method='first'), 4, labels=['Q1','Q2','Q3','Q4']))\n"
   "rows = []\nfor k, sub in q.groupby('kuartil', observed=True):\n"
   "    gg = sub.groupby('test group')['converted'].agg(['count', 'sum'])\n"

@@ -34,9 +34,9 @@ ax = fig.add_axes([0.08, 0.14, 0.55, 0.42])
 HARI = {"Monday": "Sen", "Tuesday": "Sel", "Wednesday": "Rab", "Thursday": "Kam", "Friday": "Jum", "Saturday": "Sab", "Sunday": "Min"}
 names = [HARI[s["segmen"]] for s in seg]
 vals = [float(s["diff"]) * 100 for s in seg]
-colors = ["#188038" if float(s["p_holm"]) < 0.05 else "#9AA0A6" for s in seg]
+colors = ["#188038" if float(s["p_bonferroni"]) < 0.05 else "#9AA0A6" for s in seg]
 ax.bar(names, vals, color=colors)
-ax.set_title("Selisih CR ad − psa per hari (poin %; hijau = signifikan setelah Holm)", fontsize=10, loc="left")
+ax.set_title("Selisih CR ad − psa per hari (poin %; hijau = signifikan setelah Bonferroni)", fontsize=10, loc="left")
 ax.set_ylabel("poin %"); ax.spines[["top", "right"]].set_visible(False)
 
 # Keputusan

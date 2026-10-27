@@ -22,7 +22,7 @@ Apakah menampilkan iklan menghasilkan conversion rate lebih tinggi daripada PSA,
 - Grup: ad 564,577 user (96,0%), psa 23,524 user.
 
 ## 3. Analysis
-- CR ad **2,55%**, CR psa **1,79%**. Selisih **0,77 poin** (95% CI 0,60 s.d. 0,94), p < 0,0001.
+- CR ad **2,55%**, CR psa **1,79%**. Selisih **0,77 poin** (95% CI 0,59 s.d. 0,94), p < 0,0001.
 - **SRM gagal:** chi-square = 497,769, p < 0,0001. Pembagian grup tidak 50:50.
 - Efek hanya terlihat di kuartil teratas total ads (selisih 3,01 poin, p < 0,0001). Tiga kuartil lainnya tidak berbeda.
 - Cohen's h = 0.053 (kecil).

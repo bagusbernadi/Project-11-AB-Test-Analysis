@@ -4,7 +4,6 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import numpy as np, pandas as pd, duckdb
 from scipy import stats
-from statsmodels.stats.multitest import multipletests
 from common import DB_PATH, RES_ANA, ALPHA, POWER, MDE, SEED, BOOT_REPS, P99_PERCENTILE
 from abtest import two_prop_test, srm_test, sample_size_per_group
 
@@ -43,7 +42,7 @@ rows.append(dict(uji="SRM chi-square (50:50)", z=srm["chi2"], p_value=srm["p_val
 
 order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 seg = pd.DataFrame([dict(segmen=d, **prop_test(sub)) for d, sub in df.groupby("most_ads_day")]).set_index("segmen").loc[order].reset_index()
-seg["p_holm"] = multipletests(seg["p_value"], method="holm")[1]
+seg["p_bonferroni"] = (seg["p_value"] * len(seg)).clip(upper=1.0)
 seg.to_csv(RES_ANA / "segment_day.csv", index=False)
 
 pd.DataFrame([dict(jam=h, **prop_test(sub)) for h, sub in df.groupby("most_ads_hour")]).sort_values("jam").to_csv(RES_ANA / "segment_hour.csv", index=False)

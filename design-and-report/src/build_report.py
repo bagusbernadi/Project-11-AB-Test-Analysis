@@ -50,6 +50,11 @@ NAMA_HARI = {"Monday": "Senin", "Tuesday": "Selasa", "Wednesday": "Rabu", "Thurs
              "Friday": "Jumat", "Saturday": "Sabtu", "Sunday": "Minggu"}
 
 
+_sig = [NAMA_HARI[s] for s, v in zip(seg.segmen, seg.p_bonferroni) if v < 0.05]
+_non = [NAMA_HARI[s] for s, v in zip(seg.segmen, seg.p_bonferroni) if v >= 0.05]
+_join = lambda xs: ", ".join(xs[:-1]) + " dan " + xs[-1] if len(xs) > 1 else (xs[0] if xs else "tidak ada")
+
+
 def pv(p):
     p = float(p)
     return "< 0,0001" if p < 0.0001 else D(p, 4)
@@ -86,11 +91,11 @@ def sec2():
         (5, "Apakah selisih signifikan (uji z dua proporsi)?",
          f"Ya. z = {D(Z.z, 2)}, p {pv(Z.p_value)}."),
         (6, "Berapa confidence interval selisih?",
-         f"95%: {pp(Z.ci_low)} s.d. {pp(Z.ci_high)} poin. Bootstrap 2.000 resample: {pp(BOOT.ci_low)} s.d. {pp(BOOT.ci_high)} poin."),
+         f"95% (Newcombe, berbasis Wilson): {pp(Z.ci_low)} s.d. {pp(Z.ci_high)} poin. Bootstrap 2.000 resample: {pp(BOOT.ci_low)} s.d. {pp(BOOT.ci_high)} poin."),
         (7, "Berapa Cohen's h dan power untuk MDE 0,5 poin?",
          f"Cohen's h = {D(H, 3)} (kecil). Daya untuk MDE 0,5 poin mendekati 100% pada ukuran sampel ini."),
         (8, "Apakah selisih sama di tiap hari dalam seminggu?",
-         "Tidak merata. Selasa, Senin, Rabu, Jumat, dan Sabtu signifikan setelah koreksi Holm; Kamis dan Minggu tidak."),
+         f"{'Tidak merata. ' if _non else 'Merata. '}Signifikan setelah koreksi Bonferroni (7 uji): {_join(_sig)}. Tidak signifikan: {_join(_non)}."),
         (9, "Apakah selisih bergantung pada intensitas iklan (kuartil total ads)?",
          f"Ya. Hanya kuartil teratas yang berbeda (selisih {pp(Q4['diff'])} poin, p {pv(Q4.p_value)}). Tiga kuartil lainnya tidak."),
         (10, "Berapa tambahan konversi per 1 juta user (estimasi, dengan rentang)?",
@@ -138,7 +143,7 @@ def sec5():
         ["5", "Muat ke DuckDB", verdict("Sesuai")],
         ["6", "SRM", verdict("Sesuai")],
         ["7", "Uji selisih", verdict("Sesuai")],
-        ["8", "Segmen hari dan intensitas", verdict("Sesuai")],
+        ["8", "Segmen hari dan intensitas (koreksi Bonferroni)", verdict("Sesuai + penyesuaian")],
         ["9", "Bootstrap dan sensitivitas", verdict("Sesuai")],
         ["10", "Estimasi dampak", verdict("Sesuai")],
         ["11", "Cek silang SQL vs Python", verdict("Sesuai")],
@@ -178,13 +183,13 @@ def sec7():
         '<p><b>Jangan rollout dari angka ini saja.</b> Pastikan mekanisme alokasi grup dengan pemilik data, lalu jalankan ulang test dengan alokasi acak 50:50 dan catat sumber serta tanggalnya.</p></div>'
         '<h4>7.5 Saran perbaikan</h4><div class="card"><ul>'
         '<li>Tambahkan uji ulang dengan alokasi acak 50:50 setelah mekanisme grup dipastikan.</li>'
-        '<li>Tambahkan Wilson CI dan koreksi Bonferroni bila standar metode disepakati.</li>'
         '<li>Tambahkan kolom tanggal dan negara jika ada, agar Q3 dan Q8 bisa dijawab penuh.</li></ul></div>'
         '<h4>7.6 Batasan</h4><div class="card"><ul>'
         f'<li><b>SRM gagal:</b> {P(N_AD / N_CLEAN, 1)} vs {P(N_PSA / N_CLEAN, 1)}. Batasan utama.</li>'
         '<li><b>Tanpa tanggal dan negara:</b> efek kebaruan dan tren waktu tidak bisa diuji.</li>'
         '<li><b>Total ads mungkin dipengaruhi perlakuan:</b> dipakai untuk deskripsi, bukan kontrol kausal.</li>'
         '<li><b>Tanpa nilai pembelian:</b> dampak revenue tidak dihitung.</li>'
+        '<li><b>Penyimpangan dari rancangan:</b> pane Design menyebut koreksi Holm; analisis memakai Bonferroni dan CI selisih Newcombe (berbasis Wilson) sesuai standar portofolio. Uji z, bootstrap, dan keputusan utama tidak berubah.</li>'
         '<li><b>Lisensi belum diverifikasi.</b> Halaman Kaggle tidak bisa diakses dari sandbox.</li></ul></div>'
     )
 

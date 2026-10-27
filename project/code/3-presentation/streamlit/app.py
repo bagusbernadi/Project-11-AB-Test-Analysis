@@ -50,9 +50,9 @@ elif page == "Segmen & Waktu":
     s = s.sort_values("urut")
     s["Hari"] = s["segmen"].map(NAMA)
     s["Selisih (poin %)"] = (s["diff"] * 100).round(2)
-    s["Signifikan (Holm)"] = s["p_holm"] < 0.05
+    s["Signifikan (Bonferroni)"] = s["p_bonferroni"] < 0.05
     st.bar_chart(s.set_index("Hari")["Selisih (poin %)"])
-    st.dataframe(s[["Hari", "n_ad", "n_psa", "conv_ad", "conv_psa", "Selisih (poin %)", "p_holm", "Signifikan (Holm)"]],
+    st.dataframe(s[["Hari", "n_ad", "n_psa", "conv_ad", "conv_psa", "Selisih (poin %)", "p_bonferroni", "Signifikan (Bonferroni)"]],
                  width='stretch', hide_index=True)
     st.subheader("Kuartil total ads")
     q = qt[["kuartil_total_ads", "conv_ad", "conv_psa", "diff", "p_value"]].copy()

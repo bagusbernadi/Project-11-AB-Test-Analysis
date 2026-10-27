@@ -16,7 +16,7 @@
 ## Uji sensitivitas
 - **S1**: buang user dengan `total ads` di atas P99 (202). Hasil: selisih tetap signifikan (0,79 poin).
 - **S2**: segmen per kuartil `total ads`. Efek terlihat hanya di kuartil teratas.
-- **S3**: koreksi Holm untuk uji per hari (7 uji).
+- **S3**: koreksi Bonferroni untuk uji per hari (7 uji): p disesuaikan = min(1, p × 7).
 
 ## Catatan
 - `total ads` kemungkinan dipengaruhi oleh perlakuan (jumlah iklan yang dilihat). Dipakai untuk deskripsi segmen, bukan sebagai variabel kontrol kausal.

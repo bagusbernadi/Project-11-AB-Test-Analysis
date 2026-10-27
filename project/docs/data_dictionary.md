@@ -28,7 +28,7 @@ Sumber: `project/data/raw/marketing_AB.csv` (tidak di-commit). Database: `projec
 |---|---|
 | `cleaning_log.csv` | jumlah baris per langkah cleaning |
 | `group_summary.csv` | ringkasan per grup |
-| `segment_day.csv` | uji per hari, dengan p_holm |
+| `segment_day.csv` | uji per hari, dengan p_bonferroni |
 | `segment_hour.csv` | ringkasan per jam |
 | `segment_ads_quartile.csv` | uji per kuartil total ads |
 | `test_results.csv` | semua uji statistik dan sensitivitas |
