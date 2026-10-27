@@ -1,0 +1,4 @@
+step,rows_in,rows_out,detail
+baca,588101,588101,kolom indeks dibuang
+grup tidak valid,588101,588101,grup selain ad/psa
+user ganda (ambil kunjungan pertama),588101,588101,user_id duplikat

@@ -1,67 +1,29 @@
-[← Back to portfolio](https://bagusbernadi.github.io/)
-
 # Project 11: A/B Test Analysis
 
-**Status: Design (rancangan).** Halaman rancangan ada di [`index.html`](index.html). Analisis, dashboard, dan angka hasil belum dikerjakan, sehingga bagian Analysis, Recommendation, dan Impact di bawah masih kosong.
+**Status: sedang dikerjakan di branch `project-11-build`.** Belum digabung ke main. Revisi halaman Design dan Report v2 belum selesai, dashboard, notebook, dan one-sheet belum dibuat.
 
-**Tujuan:** membangun analisis eksperimen dan dashboard yang menguji apakah halaman web baru (B) benar-benar menghasilkan konversi lebih tinggi daripada halaman lama (A), sehingga keputusan rollout diambil berdasarkan bukti.
+**Tujuan:** menguji apakah iklan (ad) menghasilkan conversion rate lebih tinggi dibanding PSA (public service announcement), dan apakah perbedaannya cukup besar untuk keputusan rollout.
 
-| | |
-|---|---|
-| Kategori | E-commerce / retail |
-| Tingkat | Mudah |
-| Data | Dataset publik A/B testing halaman web (Kaggle) |
-| Tools | DuckDB + SQL, Python (pandas, SciPy, statsmodels), Streamlit + Plotly |
+## Hasil awal (dari `outputs/test_results.csv`)
+- CR ad 2,55% vs psa 1,79%. Selisih 0,77 poin (95% CI 0,60 s.d. 0,94). p < 0,001.
+- **SRM gagal:** user dibagi 564.577 (ad) dan 23.524 (psa), jauh dari 50:50. Hipotesis pembagian seimbang ditolak. Perbandingan ini perlu kehati-hatian.
+- Efek hanya terlihat di kuartil teratas `total ads` (CR 8,3% vs 5,3%). Kuartil lain tidak berbeda.
+- Daya cukup untuk MDE 0,5 poin. Ukuran sampel yang dibutuhkan 6.237 per grup.
 
-## 1. Problem
+## Data
+Dataset publik `marketing_AB.csv` (588.101 baris). Tidak ada kolom negara dan tanggal. Lihat `data/README.md`.
 
-**Pertanyaan utama:** Apakah halaman baru (B) benar-benar menghasilkan conversion rate lebih tinggi daripada halaman lama (A), dan apakah perbedaannya cukup besar untuk di-rollout?
-
-Rancangan memecahnya menjadi 14 pertanyaan (9 Utama, 4 Pendukung, 1 Tambahan) dalam tema data dan randomisasi, hasil utama, segmen dan waktu, keputusan dan dampak, serta validitas. Daftar lengkap ada di bagian 2 halaman rancangan.
-
-## 2. Data
-
-- Sumber data: [here](https://www.kaggle.com/datasets/mostafaelmehy/ab-data) (Versi: 1, Tanggal akses: 23 Oktober 2026)
-- Ukuran (perkiraan, **belum diverifikasi**): ±294 ribu baris kunjungan, 5 kolom, ±3 minggu, ditambah file negara.
-- Aturan uji ditetapkan sebelum melihat hasil: alpha 0,05 dua arah, power 80%, MDE 0,5 poin.
-- Rencana tabel: `visits`, `users`, `daily_summary`, `test_results`.
-- Lisensi dan sitasi: dicek di halaman sumber sebelum project dipublikasikan.
-- Data mentah tidak di-commit ke repository.
-
-## 3. Analysis
-
-Belum dikerjakan. Rencana langkah (12 langkah, tahap A sampai D) ada di bagian 6 halaman rancangan. Semua angka nanti dihitung dari data dengan SQL dan dicek silang.
-
-Hipotesis yang akan diuji (belum terbukti):
-1. Halaman baru tidak meningkatkan conversion rate secara bermakna.
-2. Pembagian grup seimbang.
-3. Hasil tidak berbeda antar negara.
-4. Tidak ada efek kebaruan yang kuat.
-5. Baris bermasalah <2% dan tidak mengubah kesimpulan.
-
-## 4. Recommendation
-
-Belum dikerjakan. Output yang direncanakan: keputusan rollout halaman baru.
-
-## 5. Impact
-
-Belum dikerjakan. Rumus yang akan dipakai (semua hasil diberi label `estimated`):
-
-```
-Tambahan konversi per bulan = selisih conversion rate × user per bulan (dengan rentang confidence interval)
+## Menjalankan
+```bash
+pip install -r requirements.txt
+# letakkan marketing_AB.csv di data/raw/
+python3 -I scripts/01_analysis.py
 ```
 
-## Batasan yang sudah diketahui
-
-- Signifikan tidak sama dengan penting.
-- Analisis memakai data penuh, tidak mengintip di tengah.
-- Tidak ada nilai pembelian di dataset.
-
-## Struktur repository
-
+## Struktur
 ```
-index.html   Halaman rancangan project (bisa dibuka di browser atau lewat GitHub Pages)
-README.md    Dokumen ini
+scripts/01_analysis.py      cleaning, uji, SRM, segmen, sensitivitas
+outputs/                    CSV hasil dan log
+docs/definitions.md         definisi, asumsi berlabel, uji sensitivitas
+data/README.md              sumber dan lisensi (belum diverifikasi)
 ```
-
-Folder `docs/`, `data/`, `scripts/`, `sql/`, `notebooks/`, `dashboard/`, dan `outputs/` ditambahkan saat pengerjaan dimulai.
