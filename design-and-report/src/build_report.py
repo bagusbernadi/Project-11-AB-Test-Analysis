@@ -1,6 +1,6 @@
-"""Generator Report v2 (Project 11). Membaca outputs/*.csv, merakit design-and-report/index.html.
+"""Generator Report v2 (Project 11). Membaca project/results/*/*.csv, merakit design-and-report/index.html.
 
-Jalankan dari root repo setelah scripts/01_analysis.py:
+Jalankan dari root repo setelah project/code/run_all.sh (tahap 1-3):
     python3 design-and-report/src/build_report.py
 Pane Design diambil dari src/design_pane.html dan tidak diubah (dicek identik di akhir).
 Basis HTML/CSS dari src/base_head.html (Project 12), report_lib.py dan report.css disalin dari Project 4.
@@ -14,21 +14,24 @@ import pandas as pd
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-OUT = ROOT / "outputs"
 sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(ROOT / "project" / "code"))
+from common import RES_PREP, RES_ANA, RES_PRES  # noqa: E402
 import report_lib as R
 from report_lib import D, I, P, audit, gbars, pill, qa, table
 
 # ---------- data ----------
-FILES = {"cleaning_log.csv", "group_summary.csv", "segment_day.csv", "segment_hour.csv",
-         "segment_ads_quartile.csv", "test_results.csv", "crosscheck.csv", "one_sheet.png", "one_sheet.pdf"}
-assert {p.name for p in OUT.iterdir() if p.is_file()} == FILES, "ada file hasil yang belum terdaftar"
+FILES = {RES_PREP: {"cleaning_log.csv"},
+         RES_ANA: {"group_summary.csv", "segment_day.csv", "segment_hour.csv", "segment_ads_quartile.csv", "test_results.csv", "crosscheck.csv"},
+         RES_PRES: {"one_sheet.png", "one_sheet.pdf", "analysis.ipynb", "presentasi.pptx"}}
+for _folder, _names in FILES.items():
+    assert {p.name for p in _folder.iterdir() if p.is_file()} == _names, f"ada file hasil yang belum terdaftar di {_folder.name}"
 
-cl = pd.read_csv(OUT / "cleaning_log.csv")
-grp = pd.read_csv(OUT / "group_summary.csv").set_index("group")
-seg = pd.read_csv(OUT / "segment_day.csv")
-qt = pd.read_csv(OUT / "segment_ads_quartile.csv")
-tr = pd.read_csv(OUT / "test_results.csv").set_index("uji")
+cl = pd.read_csv(RES_PREP / "cleaning_log.csv")
+grp = pd.read_csv(RES_ANA / "group_summary.csv").set_index("group")
+seg = pd.read_csv(RES_ANA / "segment_day.csv")
+qt = pd.read_csv(RES_ANA / "segment_ads_quartile.csv")
+tr = pd.read_csv(RES_ANA / "test_results.csv").set_index("uji")
 
 N_RAW = int(cl.rows_in.iloc[0])
 N_CLEAN = int(cl.rows_out.iloc[-1])
@@ -65,7 +68,7 @@ def verdict(v):
 def sec1():
     return (f'<div class="card"><p><b>Sumber:</b> Kaggle, "Marketing A/B Testing" (faviovaz/marketing-ab-testing), file <code>marketing_AB.csv</code>. '
             f'Lisensi dan sitasi belum diverifikasi. Data mentah tidak di-commit.</p>'
-            f'<p><b>Baris:</b> {I(N_RAW)} baris mentah, {I(N_BAD)} dibuang, {I(N_CLEAN)} dipakai. Log per langkah ada di <code>outputs/cleaning_log.csv</code>.</p>'
+            f'<p><b>Baris:</b> {I(N_RAW)} baris mentah, {I(N_BAD)} dibuang, {I(N_CLEAN)} dipakai. Log per langkah ada di <code>project/results/1-data-preparation/cleaning_log.csv</code>.</p>'
             f'<p><b>Grup:</b> ad {I(N_AD)} user, psa {I(N_PSA)} user.</p>'
             f'<p><b>Hasil yang dihasilkan:</b> <code>group_summary.csv</code>, <code>segment_day.csv</code>, <code>segment_ads_quartile.csv</code>, <code>test_results.csv</code>, dan log jalan.</p></div>')
 
@@ -148,8 +151,8 @@ def sec6():
         ["Dashboard Streamlit (4 halaman)", verdict("Sesuai")],
         ["One-sheet PDF/PNG", verdict("Sesuai")],
         ["Database DuckDB dan folder SQL", verdict("Sesuai")],
-        ["Modul Python uji A/B (src/abtest.py)", verdict("Sesuai")],
-        ["Notebook analisis (notebooks/analysis.ipynb)", verdict("Sesuai")],
+        ["Modul Python uji A/B (2-analysis/python/abtest.py)", verdict("Sesuai")],
+        ["Notebook analisis (3-presentation/analysis.ipynb)", verdict("Sesuai")],
         ["Slide presentasi (opsional, 7 slide)", verdict("Sesuai")],
                 ["README", verdict("Sesuai")],
         ["Repositori GitHub", verdict("Sesuai")],
@@ -174,8 +177,8 @@ def sec7():
         '<h4>7.4 Rekomendasi</h4><div class="card">'
         '<p><b>Jangan rollout dari angka ini saja.</b> Pastikan mekanisme alokasi grup dengan pemilik data, lalu jalankan ulang test dengan alokasi acak 50:50 dan catat sumber serta tanggalnya.</p></div>'
         '<h4>7.5 Saran perbaikan</h4><div class="card"><ul>'
-        '<li>Hubungkan skrip 01 ke src/abtest.py agar satu sumber rumus.</li>'
-        '<li>Ubah angka README agar diambil dari CSV.</li>'
+        '<li>Tambahkan uji ulang dengan alokasi acak 50:50 setelah mekanisme grup dipastikan.</li>'
+        '<li>Tambahkan Wilson CI dan koreksi Bonferroni bila standar metode disepakati.</li>'
         '<li>Tambahkan kolom tanggal dan negara jika ada, agar Q3 dan Q8 bisa dijawab penuh.</li></ul></div>'
         '<h4>7.6 Batasan</h4><div class="card"><ul>'
         f'<li><b>SRM gagal:</b> {P(N_AD / N_CLEAN, 1)} vs {P(N_PSA / N_CLEAN, 1)}. Batasan utama.</li>'
@@ -186,8 +189,8 @@ def sec7():
     )
 
 
-N_CHECK = int(pd.read_csv(OUT / "crosscheck.csv").shape[0])
-N_FAIL = int((pd.read_csv(OUT / "crosscheck.csv").hasil == "FAIL").sum())
+N_CHECK = int(pd.read_csv(RES_ANA / "crosscheck.csv").shape[0])
+N_FAIL = int((pd.read_csv(RES_ANA / "crosscheck.csv").hasil == "FAIL").sum())
 
 TITLES = [
     ("Data yang berhasil didapatkan", "Isi data mentah, tabel di database, dan data hasil analisis", sec1),

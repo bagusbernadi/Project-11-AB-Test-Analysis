@@ -1,0 +1,12 @@
+pandas>=2.0
+numpy
+scipy
+statsmodels
+duckdb>=1.0
+matplotlib
+streamlit>=1.40
+nbformat
+nbconvert
+nbclient
+ipykernel
+python-pptx

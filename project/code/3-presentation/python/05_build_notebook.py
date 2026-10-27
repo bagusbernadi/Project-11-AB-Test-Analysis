@@ -1,19 +1,20 @@
-# Membangun notebooks/analysis.ipynb (sel kode + penjelasan). Lalu dijalankan dengan nbconvert agar output tersimpan.
-import pathlib, nbformat as nbf
-ROOT = pathlib.Path(__file__).resolve().parents[1]
+# Tahap 3: membangun results/3-presentation/analysis.ipynb (sel kode + penjelasan). Lalu dijalankan dengan nbconvert (run_all.sh).
+import sys, pathlib, nbformat as nbf
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
+from common import RES_PRES
 nb = nbf.v4.new_notebook()
 C, M = nbf.v4.new_code_cell, nbf.v4.new_markdown_cell
 nb.cells = [
 M("# Project 11: Analisis A/B test iklan vs PSA\n\n"
   "Notebook ini menjawab Q1–Q14 dari rancangan dengan dataset `marketing_AB.csv`. "
-  "Angka dihitung ulang dengan modul `src/abtest.py` dan dicocokkan dengan `outputs/`.\n\n"
+  "Angka dihitung ulang dengan modul `code/2-analysis/python/abtest.py` dan dicocokkan dengan `results/`.\n\n"
   "Aturan uji ditetapkan sebelum melihat hasil: alpha 0,05 dua arah, power 80%, MDE 0,5 poin."),
 M("## Q1 · Kualitas data\nGrup valid, tidak ada user ganda, tidak ada nilai hilang."),
-C("import sys, pandas as pd\nsys.path.insert(0, '..')\nfrom src.abtest import two_prop_test, srm_test, sample_size_per_group, cohens_h\n"
-  "raw = pd.read_csv('../data/raw/marketing_AB.csv', index_col=0)\n"
+C("import sys, pandas as pd\nsys.path.insert(0, '../../code/2-analysis/python')\nfrom abtest import two_prop_test, srm_test, sample_size_per_group, cohens_h\n"
+  "raw = pd.read_csv('../../data/raw/marketing_AB.csv', index_col=0)\n"
   "print('baris:', len(raw), '| grup:', raw['test group'].value_counts().to_dict())\n"
   "print('user ganda:', raw['user id'].duplicated().sum(), '| nilai hilang:', int(raw.isna().sum().sum()))\n"
-  "print(pd.read_csv('../outputs/cleaning_log.csv').to_string(index=False))"),
+  "print(pd.read_csv('../1-data-preparation/cleaning_log.csv').to_string(index=False))"),
 M("## Q2 · SRM (pembagian grup 50:50)\nChi-square terhadap rasio rencana. Jika gagal, kesimpulan kausal perlu batasan."),
 C("g = raw.groupby('test group')['converted'].agg(['count', 'sum'])\n"
   "n_ad, n_psa = int(g.loc['ad', 'count']), int(g.loc['psa', 'count'])\n"
@@ -41,27 +42,27 @@ C("q = raw.assign(kuartil=pd.qcut(raw['total ads'].rank(method='first'), 4, labe
   "    rows.append((k, round(a['diff']*100, 2), f\"{a['p_value']:.2e}\"))\n"
   "pd.DataFrame(rows, columns=['kuartil total ads', 'selisih (poin)', 'p'])"),
 M("## Q12–Q13 · Bootstrap dan sensitivitas\nBootstrap 2.000 resample. Sensitivitas: buang user dengan total ads di atas P99."),
-C("from src.abtest import bootstrap_diff\nprint('bootstrap:', bootstrap_diff(x_ad, n_ad, x_psa, n_psa, reps=2000))\n"
+C("from abtest import bootstrap_diff\nprint('bootstrap:', bootstrap_diff(x_ad, n_ad, x_psa, n_psa, reps=2000))\n"
   "p99 = raw['total ads'].quantile(0.99)\nsub = raw[raw['total ads'] <= p99]\n"
   "gs = sub.groupby('test group')['converted'].agg(['count','sum'])\n"
   "s = two_prop_test(int(gs.loc['ad','sum']), int(gs.loc['ad','count']), int(gs.loc['psa','sum']), int(gs.loc['psa','count']))\n"
   "print(f'P99 = {p99}; selisih tanpa outlier = {s[\"diff\"]*100:.2f} poin, p = {s[\"p_value\"]:.2e}')"),
 M("## Q10 · Estimasi dampak (estimated)\nTambahan konversi per 1 juta user. Estimasi per bulan tidak bisa dihitung karena tidak ada data trafik per bulan."),
 C("print(f\"estimated: {r['diff']*1e6:,.0f} konversi per 1 juta user (CI {r['ci_low']*1e6:,.0f} s.d. {r['ci_high']*1e6:,.0f})\".replace(',', '.'))"),
-M("## Q14 · Cek silang SQL vs Python\nHasil DuckDB dibandingkan dengan Python. Tabel lengkap di `outputs/crosscheck.csv`."),
-C("import duckdb\nf = pd.read_csv('../outputs/crosscheck.csv')\nprint(f['hasil'].value_counts().to_dict())\n"
-  "con = duckdb.connect('../abtest.duckdb', read_only=True)\nprint(con.sql('SELECT * FROM v_group_summary').df())"),
+M("## Q14 · Cek silang SQL vs Python\nHasil DuckDB dibandingkan dengan Python. Tabel lengkap di `results/2-analysis/crosscheck.csv`."),
+C("import duckdb\nf = pd.read_csv('../2-analysis/crosscheck.csv')\nprint(f['hasil'].value_counts().to_dict())\n"
+  "con = duckdb.connect('../../abtest.duckdb', read_only=True)\nprint(con.sql('SELECT * FROM v_group_summary').df())"),
 M("## Kesimpulan\n"
   "- Iklan menghasilkan conversion rate lebih tinggi dibanding PSA (selisih 0,77 poin, signifikan).\n"
   "- Pembagian grup gagal SRM (96% vs 4%). Kesimpulan kausal perlu batasan.\n"
   "- Efek hanya terlihat di kuartil total ads teratas.\n"
   "- Belum rollout berdasarkan angka ini. Pastikan alokasi grup, lalu uji ulang dengan 50:50.\n\n"
-  "Lihat [Report](../design-and-report/index.html) dan [README](../README.md) untuk ringkasan lengkap."),
+  "Lihat [Report](../../design-and-report/index.html) dan [README](../../README.md) untuk ringkasan lengkap."),
 ]
 for i, c in enumerate(nb.cells, 1):
     c.id = f"cell-{i:02d}"  # id tetap agar byte-identik antar jalan
 nb.metadata["kernelspec"] = {"name": "python3", "display_name": "Python 3", "language": "python"}
-path = ROOT / "notebooks" / "analysis.ipynb"
+path = RES_PRES / "analysis.ipynb"
 nbf.write(nb, path)
 print("ditulis:", path)
 

@@ -1,12 +1,12 @@
-# Slide presentasi (6 slide) dari outputs/*.csv. Hasil: slides/presentasi.pptx
-import pathlib, csv
+# Tahap 3: slide presentasi (7 slide) dari results/2-analysis/*.csv. Hasil: results/3-presentation/presentasi.pptx
+import sys, pathlib, csv
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-ROOT = pathlib.Path(__file__).resolve().parents[1]
-OUT = ROOT / "outputs"
-tr = {r["uji"]: r for r in csv.DictReader(open(OUT / "test_results.csv", encoding="utf-8"))}
-grp = {r["group"]: r for r in csv.DictReader(open(OUT / "group_summary.csv", encoding="utf-8"))}
+from common import RES_ANA, RES_PRES
+tr = {r["uji"]: r for r in csv.DictReader(open(RES_ANA / "test_results.csv", encoding="utf-8"))}
+grp = {r["group"]: r for r in csv.DictReader(open(RES_ANA / "group_summary.csv", encoding="utf-8"))}
 Z = tr["Z dua proporsi (ad vs psa)"]
 SRM = tr["SRM chi-square (50:50)"]
 pc = lambda v, d=2: f"{float(v) * 100:.{d}f}".replace(".", ",") + "%"
@@ -71,12 +71,11 @@ slide("Kesimpulan", [
     "Namun bukti kausal belum kuat karena alokasi grup tidak seimbang.",
     "Dashboard, one-sheet, dan notebook tersedia di repositori."])
 
-out = ROOT / "slides"; out.mkdir(exist_ok=True)
 import datetime
 prs.core_properties.created = datetime.datetime(2026, 10, 27)
 prs.core_properties.modified = datetime.datetime(2026, 10, 27)
 prs.core_properties.last_modified_by = "project-11"
-path = out / "presentasi.pptx"
+path = RES_PRES / "presentasi.pptx"
 prs.save(path)
 # Samakan timestamp entri zip agar byte-identik antar jalan
 import zipfile, io
@@ -89,7 +88,7 @@ print("ditulis:", path.name, len(prs.slides), "slide")
 
 # Bersihkan metadata waktu eksekusi notebook (nbconvert) agar hasil byte-identik antar jalan.
 import nbformat as _nbf
-_p = ROOT / "notebooks" / "analysis.ipynb"
+_p = RES_PRES / "analysis.ipynb"
 if _p.exists():
     _nb = _nbf.read(_p, as_version=4)
     for _c in _nb.cells:

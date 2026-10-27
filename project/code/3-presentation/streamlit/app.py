@@ -1,13 +1,14 @@
-"""Dashboard Project 11 (Streamlit). Membaca outputs/*.csv; tidak menghitung ulang.
-Jalankan dari root repo: streamlit run dashboard/app.py
+"""Dashboard Project 11 (Streamlit). Membaca results/2-analysis/*.csv; tidak menghitung ulang.
+Jalankan dari folder project/: streamlit run code/3-presentation/streamlit/app.py
 """
-import pathlib
+import sys, pathlib
+import numpy as np
 import pandas as pd
 import streamlit as st
 from scipy import stats
-
-ROOT = pathlib.Path(__file__).resolve().parents[1]
-OUT = ROOT / "outputs"
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
+from common import RES_ANA
+OUT = RES_ANA
 NAMA = {"Monday": "Senin", "Tuesday": "Selasa", "Wednesday": "Rabu", "Thursday": "Kamis",
         "Friday": "Jumat", "Saturday": "Sabtu", "Sunday": "Minggu"}
 
@@ -30,7 +31,7 @@ if page == "Ringkasan Hasil":
     c1.metric("CR ad", f"{grp.loc['ad', 'conv_rate']*100:.2f}%")
     c2.metric("CR psa", f"{grp.loc['psa', 'conv_rate']*100:.2f}%")
     c3.metric("Selisih (poin)", f"{Z['diff']*100:.2f}", f"CI 95% {Z.ci_low*100:.2f} s.d. {Z.ci_high*100:.2f}")
-    st.caption(f"p-value {Z.p_value:.2e}. Cohen's h = {Z.cohens_h:.3f} (kecil). Angka dari outputs/test_results.csv.")
+    st.caption(f"p-value {Z.p_value:.2e}. Cohen's h = {Z.cohens_h:.3f} (kecil). Angka dari results/2-analysis/test_results.csv.")
     est = f"{Z['diff']*1e6:,.0f}".replace(",", ".")
     st.info(f"Estimasi: sekitar {est} konversi tambahan per 1 juta user (estimated, tanpa data trafik per bulan).")
 
@@ -64,7 +65,6 @@ else:
     mde = st.slider("MDE (poin persentase)", 0.1, 2.0, 0.5, 0.1)
     p0 = float(grp.loc["psa", "conv_rate"])
     p1 = min(p0 + mde / 100, 0.999)
-    import numpy as np
     h = 2 * np.arcsin(np.sqrt(p1)) - 2 * np.arcsin(np.sqrt(p0))
     n = int(np.ceil(((stats.norm.ppf(0.975) + stats.norm.ppf(0.80)) / h) ** 2))
     st.metric("Ukuran sampel per grup", f"{n:,}".replace(",", "."))

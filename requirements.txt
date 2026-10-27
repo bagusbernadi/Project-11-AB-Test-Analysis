@@ -1,7 +1,0 @@
-pandas
-numpy
-scipy
-statsmodels
-duckdb
-matplotlib
-streamlit

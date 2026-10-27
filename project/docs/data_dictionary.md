@@ -1,6 +1,6 @@
 # Kamus data
 
-Sumber: `data/raw/marketing_AB.csv` (tidak di-commit). Database: `abtest.duckdb` (dibuat ulang oleh `scripts/02_load_duckdb.py`).
+Sumber: `project/data/raw/marketing_AB.csv` (tidak di-commit). Database: `project/abtest.duckdb` (dibuat ulang oleh `project/code/1-data-preparation/python/01_clean_load.py`).
 
 ## Data mentah (`raw_visits`)
 | Kolom asli | Kolom DuckDB | Tipe | Arti |
@@ -19,11 +19,11 @@ Sumber: `data/raw/marketing_AB.csv` (tidak di-commit). Database: `abtest.duckdb`
 - User ganda: ambil baris dengan `src_row` terkecil (0 baris ganda).
 - Hasil: 588.101 baris.
 
-## View (`sql/01_group_views.sql`)
+## View (`project/code/2-analysis/sql/01_group_views.sql`)
 - `v_group_summary`: n, konversi, conv_rate, median dan rata-rata total_ads per grup.
 - `v_day_summary`: n_ad, n_psa, cr_ad, cr_psa per hari dalam seminggu.
 
-## File hasil (`outputs/`)
+## File hasil (`project/results/`)
 | File | Isi |
 |---|---|
 | `cleaning_log.csv` | jumlah baris per langkah cleaning |

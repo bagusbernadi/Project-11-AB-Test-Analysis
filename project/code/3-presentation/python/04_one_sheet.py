@@ -1,13 +1,13 @@
-# One-sheet infografik (PNG dan PDF) dari outputs/*.csv. Jalankan dari root repo.
-import pathlib, csv
+# Tahap 3: one-sheet infografik (PNG dan PDF) dari results/2-analysis/*.csv.
+import sys, pathlib, csv
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-ROOT = pathlib.Path(__file__).resolve().parents[1]
-OUT = ROOT / "outputs"
-tr = {r["uji"]: r for r in csv.DictReader(open(OUT / "test_results.csv", encoding="utf-8"))}
-grp = {r["group"]: r for r in csv.DictReader(open(OUT / "group_summary.csv", encoding="utf-8"))}
-seg = list(csv.DictReader(open(OUT / "segment_day.csv", encoding="utf-8")))
+from common import RES_ANA, RES_PRES
+tr = {r["uji"]: r for r in csv.DictReader(open(RES_ANA / "test_results.csv", encoding="utf-8"))}
+grp = {r["group"]: r for r in csv.DictReader(open(RES_ANA / "group_summary.csv", encoding="utf-8"))}
+seg = list(csv.DictReader(open(RES_ANA / "segment_day.csv", encoding="utf-8")))
 Z = tr["Z dua proporsi (ad vs psa)"]
 pct = lambda v: f"{float(v) * 100:.2f}%".replace(".", ",")
 pts = lambda v: f"{float(v) * 100:.2f}".replace(".", ",")
@@ -48,9 +48,9 @@ txt = ("Keputusan\n\n"
        "• Estimasi: +" + f"{float(Z['diff']) * 1e6:,.0f}".replace(",", ".") + " konversi per 1 juta user (estimated).\n\n"
        "Langkah: pastikan alokasi grup, lalu uji ulang dengan 50:50.")
 ax2.text(0, 1, txt, va="top", fontsize=10.5, color="#202124", wrap=True)
-fig.text(0.05, 0.05, "Data: marketing_AB.csv (Kaggle, faviovaz/marketing-ab-testing). Lisensi belum diverifikasi. Angka dari outputs/test_results.csv.",
+fig.text(0.05, 0.05, "Data: marketing_AB.csv (Kaggle, faviovaz/marketing-ab-testing). Lisensi belum diverifikasi. Angka dari results/2-analysis/test_results.csv.",
          fontsize=8.5, color="#5F6368")
 
-png, pdf = OUT / "one_sheet.png", OUT / "one_sheet.pdf"
+png, pdf = RES_PRES / "one_sheet.png", RES_PRES / "one_sheet.pdf"
 fig.savefig(png, metadata={"Software": "matplotlib"}); fig.savefig(pdf, metadata={"CreationDate": None, "Creator": "matplotlib"})
 print("ditulis:", png.name, pdf.name)
