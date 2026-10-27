@@ -18,5 +18,8 @@
 - **S2**: segmen per kuartil `total ads`. Efek terlihat hanya di kuartil teratas.
 - **S3**: koreksi Bonferroni untuk uji per hari (7 uji): p disesuaikan = min(1, p × 7).
 
+## Walk-forward
+Tidak berlaku. Dataset tidak punya tanggal atau lot, dan analisis tidak memakai aturan keputusan berbasis urutan waktu. Kestabilan hasil diuji lewat bootstrap, sensitivitas P99 (S1), dan segmen (S2, S3).
+
 ## Catatan
 - `total ads` kemungkinan dipengaruhi oleh perlakuan (jumlah iklan yang dilihat). Dipakai untuk deskripsi segmen, bukan sebagai variabel kontrol kausal.
