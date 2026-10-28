@@ -45,7 +45,7 @@ slide("Data dan metode", [
     "Uji z dua proporsi, CI 95%, Cohen's h, bootstrap 2.000 resample.",
     "Cek SRM (chi-square terhadap 50:50), segmen hari, kuartil total ads, sensitivitas P99.",
     "Cek silang SQL (DuckDB) vs Python: 36 cek, semua PASS."],
-    note="Dataset tidak memiliki tanggal dan negara. Lisensi belum diverifikasi.")
+    note="Dataset tidak memiliki tanggal dan negara. Lisensi CC0 (label Kaggle).")
 
 slide("Hasil utama", [
     f"CR ad {pc(grp['ad']['conv_rate'])} vs psa {pc(grp['psa']['conv_rate'])}.",

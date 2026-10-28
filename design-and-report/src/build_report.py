@@ -97,7 +97,7 @@ def sec1():
     cl_rows = [[esc(cs(r.step)), I(r.rows_in), I(r.rows_out), esc(cs(r.detail))] for r in cl.itertuples()]
     return (
         f'<div class="card"><p><b>Sumber:</b> Kaggle, "Marketing A/B Testing" (faviovaz/marketing-ab-testing), file <code>marketing_AB.csv</code>. '
-        f'Lisensi dan sitasi belum diverifikasi. Data mentah tidak di-commit.</p>'
+        f'Lisensi: CC0: Public Domain (label di halaman Kaggle, dicek 28 Oktober 2026). Data mentah tidak di-commit.</p>'
         f'<p><b>Baris:</b> {I(N_RAW)} baris mentah, {I(N_BAD)} dibuang, {I(N_CLEAN)} dipakai. '
         f'<b>Grup:</b> ad {I(N_AD)} user, psa {I(N_PSA)} user.</p></div>'
         '<h4 id="sec11">1.1 Data mentah dan kualitas data</h4>'
@@ -260,7 +260,7 @@ def sec3():
          "File <code>marketing_AB.csv</code> dilampirkan pengguna karena sandbox tidak bisa mengunduh. Versi dan tanggal akses belum dicatat.", verdict("Sesuai")],
         ["Ukuran", f"{I(N_RAW)} baris, satu baris per user", f"{I(N_RAW)} baris mentah, {I(N_CLEAN)} dipakai ({I(N_BAD)} dibuang)", verdict("Sesuai")],
         ["Kolom", "6 kolom, tanpa tanggal dan negara", "6 kolom, tanpa tanggal dan negara", verdict("Sesuai")],
-        ["Lisensi dan sitasi", "Belum diverifikasi", "Belum diverifikasi (halaman Kaggle tidak bisa diakses dari sandbox)", verdict("Belum dikerjakan")],
+        ["Lisensi dan sitasi", "Belum diverifikasi", "CC0: Public Domain (label Kaggle, dicek 28 Okt 2026)", verdict("Sesuai + penyesuaian")],
         ["Tabel", "users, group_summary, segment_day, test_results",
          "<code>users</code> tabel DuckDB; <code>group_summary</code> dan <code>segment_day</code> view SQL dan CSV; <code>test_results</code> CSV",
          verdict("Sesuai + penyesuaian")],
@@ -389,7 +389,7 @@ def sec7():
         '<li><b>Hipotesis 3 belum diuji formal:</b> kesamaan selisih antar hari dinilai dari uji per hari, bukan uji interaksi.</li>'
         '<li><b>Total ads mungkin dipengaruhi perlakuan:</b> dipakai untuk deskripsi, bukan kontrol kausal.</li>'
         '<li><b>Tanpa nilai pembelian:</b> dampak revenue tidak dihitung.</li>'
-        '<li><b>Lisensi belum diverifikasi.</b> Halaman Kaggle tidak bisa diakses dari sandbox.</li></ul></div>'
+        '<li><b>Lisensi CC0.</b> Label di halaman Kaggle, dicek 28 Okt 2026.</li></ul></div>'
     )
 
 
@@ -418,7 +418,7 @@ def evq():
         ["2", "Apakah business question terjawab?", verdict("Sesuai"),
          f'{I(14)} dari {I(14)} pertanyaan terjawab, {I(6)} dengan catatan. <a href="#rp2">Lihat bagian 2</a>.'],
         ["3", "Apakah dataset sesuai Design Project?", verdict("Sesuai + penyesuaian"),
-         f'Sumber, ukuran, dan kolom sesuai; lisensi belum diverifikasi. Hipotesis: 1 terbukti, 1 sebagian, 3 tidak terbukti. <a href="#rp3">Lihat bagian 3</a>.'],
+         f'Sumber, ukuran, dan kolom sesuai; lisensi CC0 (label Kaggle). Hipotesis: 1 terbukti, 1 sebagian, 3 tidak terbukti. <a href="#rp3">Lihat bagian 3</a>.'],
         ["4", "Apakah tools yang digunakan sesuai?", verdict("Sesuai + tambahan"),
          'Python, DuckDB + SQL, Streamlit, dan Markdown dipakai; Jupyter dan python-pptx ditambahkan. <a href="#rp4">Lihat bagian 4</a>.'],
         ["5", "Apakah alur pengerjaan sesuai Design Project?", verdict("Sesuai + penyesuaian"),

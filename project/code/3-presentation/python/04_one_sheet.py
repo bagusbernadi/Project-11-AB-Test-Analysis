@@ -48,7 +48,7 @@ txt = ("Keputusan\n\n"
        "• Estimasi: +" + f"{float(Z['diff']) * 1e6:,.0f}".replace(",", ".") + " konversi per 1 juta user (estimated).\n\n"
        "Langkah: pastikan alokasi grup, lalu uji ulang dengan 50:50.")
 ax2.text(0, 1, txt, va="top", fontsize=10.5, color="#202124", wrap=True)
-fig.text(0.05, 0.05, "Data: marketing_AB.csv (Kaggle, faviovaz/marketing-ab-testing). Lisensi belum diverifikasi. Angka dari results/2-analysis/test_results.csv.",
+fig.text(0.05, 0.05, "Data: marketing_AB.csv (Kaggle, faviovaz/marketing-ab-testing). Lisensi CC0 (label Kaggle). Angka dari results/2-analysis/test_results.csv.",
          fontsize=8.5, color="#5F6368")
 
 png, pdf = RES_PRES / "one_sheet.png", RES_PRES / "one_sheet.pdf"

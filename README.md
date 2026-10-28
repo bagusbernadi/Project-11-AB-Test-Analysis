@@ -17,7 +17,7 @@
 Apakah menampilkan iklan menghasilkan conversion rate lebih tinggi daripada PSA, dan apakah selisihnya cukup besar dan stabil untuk keputusan kampanye?
 
 ## 2. Data
-- Sumber: Kaggle, "Marketing A/B Testing" (faviovaz/marketing-ab-testing), file `marketing_AB.csv`. Lisensi dan sitasi belum diverifikasi.
+- Sumber: Kaggle, "Marketing A/B Testing" (faviovaz/marketing-ab-testing), file `marketing_AB.csv`. Lisensi: CC0: Public Domain (label di halaman Kaggle, dicek 28 Oktober 2026; uploader Favio Vázquez).
 - 588.101 baris, satu baris per user. Tidak ada user ganda dan tidak ada nilai hilang. Data mentah tidak di-commit.
 - Grup: ad 564,577 user (96,0%), psa 23,524 user.
 
@@ -39,7 +39,7 @@ Jangan rollout dari angka ini saja. Pastikan dulu alokasi grup dengan pemilik da
 - Tidak ada kolom tanggal dan negara. Efek kebaruan dan segmen negara tidak bisa diuji.
 - `total ads` mungkin dipengaruhi perlakuan. Dipakai untuk deskripsi, bukan kontrol kausal.
 - Tidak ada nilai pembelian.
-- Lisensi dan sitasi dataset belum diverifikasi (lihat `project/data/README.md`).
+- Lisensi dataset CC0 (label Kaggle, dicek 28 Oktober 2026). Asal data awal tidak dinyatakan di halaman Kaggle (lihat `project/data/README.md`).
 
 ## Menjalankan
 Dari root repo:
