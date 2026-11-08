@@ -4,7 +4,7 @@
 
 **Halaman web:** https://bagusbernadi.github.io/Project-11-AB-Test-Analysis/
 
-**Status: semua output rancangan selesai di branch `project-11-build` (belum digabung ke main).** Halaman project: [`design-and-report/index.html`](design-and-report/index.html). Notebook: [`project/results/3-presentation/analysis.ipynb`](project/results/3-presentation/analysis.ipynb). Dashboard: `project/code/3-presentation/streamlit/app.py`. Slide: [`project/results/3-presentation/presentasi.pptx`](project/results/3-presentation/presentasi.pptx). Lisensi dataset masih belum diverifikasi.
+**Status: semua output rancangan selesai dan digabung ke `main`.** Halaman project: [`design-and-report/index.html`](design-and-report/index.html). Notebook: [`project/results/3-presentation/analysis.ipynb`](project/results/3-presentation/analysis.ipynb). Dashboard: `project/code/3-presentation/streamlit/app.py`. Slide: [`project/results/3-presentation/presentasi.pptx`](project/results/3-presentation/presentasi.pptx). Lisensi dataset masih belum diverifikasi.
 
 **Tujuan:** menguji apakah iklan (ad) menghasilkan conversion rate lebih tinggi daripada PSA (layanan masyarakat), dan apakah selisihnya cukup besar dan stabil untuk keputusan kampanye.
 
